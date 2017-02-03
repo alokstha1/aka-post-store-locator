@@ -64,13 +64,10 @@ jQuery(document).ready( function() {
         if ( confirm("Are you sure?") ) {
                 jQuery(this).closest('tr').remove();
                 var fields_count = jQuery('[name="aka_fields_count"]').val();
-                jQuery('[name="aka_fields_count"]').val(--fields_count);
+                // jQuery('[name="aka_fields_count"]').val(--fields_count);
            }
     });
 
-    // var input = jQuery('input.aka-location');
-    // var input = document.getElementById('aka-location');
-    // var autocomplete = new google.maps.places.Autocomplete(input);
 
     // Show the tooltips.
     jQuery( ".aka-info" ).on( "mouseover", function() {

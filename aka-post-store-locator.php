@@ -42,6 +42,9 @@ if ( !class_exists('Aka_Stores') ) {
 
             add_action( 'save_post', array( $this, 'aka_stores_save_posts' ) );
             add_shortcode( 'aka-stores', array( $this, 'aka_list_stores') );
+
+            add_action( 'wp_ajax_aka_store_search', array( $this, 'aka_store_search' ) );
+            add_action( 'wp_ajax_nopriv_aka_store_search', array( $this, 'aka_store_search' ) );
         }
 
 
@@ -295,7 +298,7 @@ if ( !class_exists('Aka_Stores') ) {
 
             if ( isset( $_POST['aka_store_meta'] ) && !empty( $_POST['aka_store_meta'] ) ) {
 
-                update_post_meta( $post_id, 'aka_saved_locators', $_POST['aka_store_meta'] );
+                update_post_meta( $post_id, 'aka_saved_locators', array_values( $_POST['aka_store_meta'] ) );
             } else {
                 update_post_meta( $post_id, 'aka_saved_locators', '' );
             }
@@ -304,10 +307,14 @@ if ( !class_exists('Aka_Stores') ) {
 
         public function aka_list_stores( $atts ) {
 
+            global $aka_store_setting;
+
             $values = shortcode_atts( array(
                 'id'    => '',
                 ), $atts );
+
             $post_id = get_the_ID();
+
             if ( isset( $values['id'] ) && !empty( $values['id'] ) ) {
                 $post_id = $values['id'];
             }
@@ -318,19 +325,50 @@ if ( !class_exists('Aka_Stores') ) {
             <div class="aka-store-wrap">
                 <?php
                 if ( !empty( $aka_saved_locators ) ) { ?>
-                <ul class="aka-store-lists">
+                <ul class="aka-store-lists" id="aka-store-lists">
 
                     <?php
                     foreach ( $aka_saved_locators as $aka_key => $store_value ) {
-                            // pre_debug($store_value);
-                            // pre_debug($aka_key);
+                        // pre_debug($store_value);
+                        // pre_debug($aka_key);
                         ?>
-                        <li class="store-items" id="store-item-id-<?php echo $aka_key; ?>" data-storeid="<?php echo $aka_key; ?>" data-latlng="<?php echo $store_value['aka_location_latn']; ?>">
+                        <li class="store-items" id="store-item-id-<?php echo $aka_key; ?>" data-storeid="<?php echo $aka_key; ?>" data-storename="<?php echo $store_value['aka_name']; ?>" data-storeurl="<?php echo $store_value['aka_url']; ?>" data-latlng="<?php echo $store_value['aka_location_latn']; ?>" data-phone="<?php echo $store_value['aka_phone']; ?>" data-address="<?php echo $store_value['aka_location']; ?>">
                             <div class="map-content">
+                                <span class="store-key"><?php echo ++$aka_key; ?></span>
                                 <span class="store-title">
-                                    <?php echo $store_value['aka_name']; ?>
+                                    <?php $return_output = aka_stores_get_link_title( $store_value['aka_name'], $store_value['aka_url'], $aka_store_setting['show_url_field'] );
+
+                                    if ( !empty( $return_output ) ) {
+
+                                        if ( !empty( $return_output['before_wrap'] ) ) {
+                                            echo $return_output['before_wrap'];
+                                        }
+                                        if ( !empty( $return_output['title'] ) ) {
+                                            echo $return_output['title'];
+                                        }
+                                        if ( !empty( $return_output['after_wrap'] ) ) {
+                                            echo $return_output['after_wrap'];
+                                        }
+                                    }
+                                    ?>
                                 </span>
-                                <p><?php echo $store_value['aka_description']; ?></p>
+                                <?php
+                                if ( $aka_store_setting['show_phone_field'] ) {
+
+                                    echo '<span class="store-phone">'.$store_value['aka_phone'].'</span>';
+
+                                }
+
+                                echo '<span class="store-address">'.$store_value['aka_location'].'</span>';
+
+                                if ( $aka_store_setting['show_description_field'] ) {
+
+                                    echo '<p>'.$store_value['aka_description'].'</p>';
+
+                                }
+
+
+                                ?>
                             </div>
                         </li>
                         <?php
@@ -354,29 +392,22 @@ if ( !class_exists('Aka_Stores') ) {
                         <div id="aka-radius">
                             <label for="aka-radius-dropdown">Search Radius</label>
                             <div class="aka-dropdown">
-                                <select id="aka-radius-dropdown" class="" name="aka-radius" style="display: none;">
-                                    <option selected="selected" value="25">25 km</option>
-                                    <option value="50">50 km</option>
-                                    <option value="100">100 km</option>
-                                    <option value="200">200 km</option>
-                                    <option value="500">500 km</option>
+                                <select id="aka-radius-dropdown" class="" name="aka-radius">
+                                    <?php echo aka_stores_get_dropdown_list('radius_options'); ?>
                                 </select>
                             </div>
                         </div>
                         <div id="aka-results">
                             <label for="aka-results-dropdown">Results</label>
                             <div class="aka-dropdown">
-                                <select id="aka-results-dropdown" class="" name="aka-results" style="display: none;">
-                                    <option value="10">10</option>
-                                    <option selected="selected" value="25">25</option>
-                                    <option value="50">50</option>
-                                    <option value="75">75</option>
-                                    <option value="100">100</option>
+                                <select id="aka-results-dropdown" class="" name="aka-results" >
+                                    <?php echo aka_stores_get_dropdown_list('max_results'); ?>
                                 </select>
                             </div>
                         </div>
                     </div>
                     <div class="aka-search-btn-wrap">
+                    <input type="hidden" id="aka_post_id" name="aka_post_id" value="<?php echo $post_id; ?>">
                         <input id="aka-search-btn" value="Search" type="submit">
                     </div>
                 </form>
@@ -391,6 +422,40 @@ if ( !class_exists('Aka_Stores') ) {
         $return_content = ob_get_clean();
         ob_flush();
         return $return_content;
+    }
+
+
+    /**
+     * Handle the Ajax search on the frontend.
+     * @return json A list of store locations that are located within the selected search radius
+     */
+    function aka_store_search() {
+        global $aka_store_setting;
+        // pre_debug($aka_store_setting);
+        $exploded_start_latlng = explode( ',', $aka_store_setting['start_latlng'] );
+        $post_id = $_POST['post_id'];
+
+
+        $myformlat = ( isset( $_POST['lat'] ) && !empty( $_POST['lat'] ) ) ? $_POST['lat'] : $exploded_start_latlng[0];
+        $myformlng = ( isset( $_POST['lng'] ) && !empty( $_POST['lng'] ) ) ? $_POST['lng'] : $exploded_start_latlng[1];
+
+pre_debug($myformlng);
+pre_debug($myformlat);
+        $aka_saved_locators = get_post_meta( $post_id, 'aka_saved_locators', true );
+        if ( !empty( $aka_saved_locators ) ) {
+pre_debug('1');
+        //     foreach ($aka_saved_locators as $store_key => $store_value) {
+        //         pre_debug('1');
+        //         $exploded_store_latlng = explode( ',', $store_value['aka_location_latn'] );
+        //         $store_lat = $exploded_store_latlng[0];
+        //         $store_lng = $exploded_store_latlng[1];
+        // pre_debug($store_lat);
+        // pre_debug($store_lng);
+        // pre_debug($store_key);
+        //     }
+        }
+        die();
+
     }
 
 

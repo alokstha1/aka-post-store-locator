@@ -2,8 +2,6 @@
 
 global $aka_store_setting;
 
-$count = get_post_meta( get_the_ID(), 'aka_fields_count', true );
-
 $aka_locators = get_post_meta( get_the_ID(), 'aka_saved_locators', true );
 $fields_count = ( isset( $aka_locators ) && !empty( $aka_locators ) ) ? count( $aka_locators ) : 0;
 

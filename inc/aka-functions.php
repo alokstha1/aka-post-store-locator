@@ -537,7 +537,7 @@ function aka_stores_max_map_zoom_levels( $max_value ) {
     $zoom_level = array(
         'min' => 10,
         'max' => 21
-    );
+        );
 
     $i = $zoom_level['min'];
 
@@ -557,6 +557,68 @@ function aka_stores_max_map_zoom_levels( $max_value ) {
 
     return $dropdown;
 }
+
+
+/**
+ * Create a dropdown list holding the search radius or
+ * max search results options.
+ */
+function aka_stores_get_dropdown_list( $list_type ) {
+
+    global $aka_store_setting;
+    // pre_debug($aka_store_setting,);
+
+    $dropdown_list = '';
+    $settings      = explode( ',', $aka_store_setting[$list_type] );
+
+    // Only show the distance unit if we are dealing with the search radius.
+    if ( $list_type == 'radius_options' ) {
+        $distance_unit = ' '. esc_attr( $aka_store_setting['distance_unit'] );
+    } else {
+        $distance_unit = '';
+    }
+
+    foreach ( $settings as $index => $setting_value ) {
+
+        // The default radius has a [] wrapped around it, so we check for that and filter out the [].
+        if ( strpos( $setting_value, '[' ) !== false ) {
+            $setting_value = filter_var( $setting_value, FILTER_SANITIZE_NUMBER_INT );
+            $selected = 'selected="selected" ';
+        } else {
+            $selected = '';
+        }
+
+        $dropdown_list .= '<option ' . $selected . 'value="'. absint( $setting_value ) .'">'. absint( $setting_value ) . $distance_unit .'</option>';
+    }
+
+    return $dropdown_list;
+}
+
+
+/*
+@since
+*/
+function aka_stores_get_link_title( $title, $url, $show_url ) {
+
+    $return_output = array();
+
+    $return_output['before_wrap'] = '';
+    $return_output['after_wrap'] = '';
+
+    if ( !empty( $url ) && $show_url ) {
+        $return_output['before_wrap'] = '<a href="'.$url.'" class="title-link" target="_blank">';
+        $return_output['title'] = $title;
+        $return_output['after_wrap'] = '</a>';
+    } else {
+        $return_output['before_wrap'] = '';
+        $return_output['title'] = $title;
+        $return_output['after_wrap'] = '';
+    }
+
+    return $return_output;
+
+}
+
 
 /*
 * Debug
