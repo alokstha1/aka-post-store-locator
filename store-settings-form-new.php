@@ -3,7 +3,7 @@ if ( !defined( 'ABSPATH' ) ) exit;
 
 global $aka_store_setting;
 
-// pre_debug($aka_store_setting);
+pre_debug($aka_store_setting);
 
 ?>
 

@@ -230,12 +230,13 @@ jQuery(document).ready( function() {
          * @returns {void}
          */
          function setInfoWindowContent( storeId, marker, infoWindow, currentMap ) {
-            var infoWindowContent = '', storeName, storeUrl, storeLatLng, storePhone, storeAddress, url = '';
+            var infoWindowContent = '', storeName, storeUrl, storeLatLng, storePhone, storeDescription, storeAddress, url = '';
             storeName = jQuery('#store-item-id-'+storeId).data('storename');
             storeUrl = jQuery('#store-item-id-'+storeId).data('storeurl');
             // storeLatLng = jQuery('#store-item-id-'+storeId).data('storelatlng');
             storePhone = jQuery('#store-item-id-'+storeId).data('phone');
             storeAddress = jQuery('#store-item-id-'+storeId).data('address');
+            storeDescription = jQuery('#store-item-id-'+storeId).data('desc');
 
             if ( typeof storeUrl !== 'undefined') {
                 url = storeUrl;
@@ -255,9 +256,21 @@ jQuery(document).ready( function() {
             infoWindowContent += '<span class="aka-address"><label>Address:</label>';
             infoWindowContent += storeAddress;
             infoWindowContent += '</span>';
-            infoWindowContent += '<span class="aka-phone"><label>Phone No:</label>';
-            infoWindowContent += storePhone;
-            infoWindowContent += '</span>';
+            if ( aka_stores.aka_settings.show_phone_field ) {
+
+                infoWindowContent += '<span class="aka-phone"><label>Phone No:</label>';
+                infoWindowContent += storePhone;
+                infoWindowContent += '</span>';
+
+            }
+            if ( aka_stores.aka_settings.show_description_field ) {
+
+                infoWindowContent += '<span class="aka-desc"><label>Description:</label>';
+                infoWindowContent += storeDescription;
+                infoWindowContent += '</span>';
+
+            }
+
             infoWindowContent += '</div>';
             openInfoWindow.length = 0;
 
@@ -486,7 +499,7 @@ jQuery(document).ready( function() {
 
                         var title_url_wrap = setTitleUrl(value.aka_name, value.aka_url, aka_stores.aka_settings.show_url_field);
 
-                        result_html += '<li class="store-items" id="store-item-id-'+index+'" data-storeid="'+index+'" data-storename="'+value.aka_name+'" data-storeurl="'+value.aka_url+'" data-latlng="'+value.aka_location_latn+'" data-phone="'+value.aka_phone+'" data-address="'+value.aka_location+'">';
+                        result_html += '<li class="store-items" id="store-item-id-'+index+'" data-storeid="'+index+'" data-storename="'+value.aka_name+'" data-storeurl="'+value.aka_url+'" data-latlng="'+value.aka_location_latn+'" data-phone="'+value.aka_phone+'" data-address="'+value.aka_location+'" data-desc="'+value.aka_description+'">';
                         result_html += '<div class="map-content">';
                         result_html += '<span class="store-key">'+serial_no+'</span>';
                         result_html += '<span class="store-title">';
