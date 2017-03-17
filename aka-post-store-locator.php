@@ -197,7 +197,7 @@ if ( !class_exists('Aka_Stores') ) {
 
                 $input_options['max_zoom_level'] = $_POST['aka_store_setting']['max_zoom_level'];
 
-                $input_options['street_view'] = isset ($_POST['aka_store_setting']['street_view'] ) ? 1 : 0;
+                $input_options['direction_view_control'] = isset ($_POST['aka_store_setting']['direction_view_control'] ) ? 1 : 0;
 
                 $input_options['map_type_control'] = isset( $_POST['aka_store_setting']['map_type_control'] ) ? 1 : 0;
 
@@ -325,16 +325,18 @@ if ( !class_exists('Aka_Stores') ) {
             <div class="aka-store-wrap">
                 <?php
                 if ( !empty( $aka_saved_locators ) ) { ?>
-                <ul class="aka-store-lists" id="aka-store-lists">
+                <ul class="store-ul-lists" id="aka-store-lists">
 
                     <?php
                     foreach ( $aka_saved_locators as $aka_key => $store_value ) {
                         // pre_debug($store_value);
                         // pre_debug($aka_key);
+                        $sn = $aka_key;
+
                         ?>
                         <li class="store-items" id="store-item-id-<?php echo $aka_key; ?>" data-storeid="<?php echo $aka_key; ?>" data-storename="<?php echo $store_value['aka_name']; ?>" data-storeurl="<?php echo $store_value['aka_url']; ?>" data-latlng="<?php echo $store_value['aka_location_latn']; ?>" data-phone="<?php echo $store_value['aka_phone']; ?>" data-address="<?php echo $store_value['aka_location']; ?>">
                             <div class="map-content">
-                                <span class="store-key"><?php echo ++$aka_key; ?></span>
+                                <span class="store-key"><?php echo ++$sn; ?></span>
                                 <span class="store-title">
                                     <?php $return_output = aka_stores_get_link_title( $store_value['aka_name'], $store_value['aka_url'], $aka_store_setting['show_url_field'] );
 
@@ -355,16 +357,20 @@ if ( !class_exists('Aka_Stores') ) {
                                 <?php
                                 if ( $aka_store_setting['show_phone_field'] ) {
 
-                                    echo '<span class="store-phone">'.$store_value['aka_phone'].'</span>';
+                                    echo '<span class="store-items">'.$store_value['aka_phone'].'</span>';
 
                                 }
 
-                                echo '<span class="store-address">'.$store_value['aka_location'].'</span>';
+                                echo '<span class="store-items">'.$store_value['aka_location'].'</span>';
 
                                 if ( $aka_store_setting['show_description_field'] ) {
 
                                     echo '<p>'.$store_value['aka_description'].'</p>';
 
+                                }
+
+                                if ( $aka_store_setting['direction_view_control'] ) {
+                                    echo '<span class="store-items"><a class="aka-get-direction" href="#" id="get-direction-'.$aka_key.'">Direction</a></span>';
                                 }
 
 
@@ -376,6 +382,15 @@ if ( !class_exists('Aka_Stores') ) {
                     ?>
 
                 </ul>
+                <?php
+            }
+
+            //Render direction routes
+            if ( $aka_store_setting['direction_view_control'] ) {
+                ?>
+                <div class="aka-ren-dir" id="aka-direction-detail" style="display: none;">
+                    <ul></ul>
+                </div>
                 <?php
             }
             ?>
@@ -407,7 +422,7 @@ if ( !class_exists('Aka_Stores') ) {
                         </div>
                     </div>
                     <div class="aka-search-btn-wrap">
-                    <input type="hidden" id="aka_post_id" name="aka_post_id" value="<?php echo $post_id; ?>">
+                        <input type="hidden" id="aka_post_id" name="aka_post_id" value="<?php echo $post_id; ?>">
                         <input id="aka-search-btn" value="Search" type="submit">
                     </div>
                 </form>
@@ -434,25 +449,34 @@ if ( !class_exists('Aka_Stores') ) {
         // pre_debug($aka_store_setting);
         $exploded_start_latlng = explode( ',', $aka_store_setting['start_latlng'] );
         $post_id = $_POST['post_id'];
+        $search_radius = $_POST['search_radius'];
+        $stores_count = $_POST['stores_count'];
 
 
         $myformlat = ( isset( $_POST['lat'] ) && !empty( $_POST['lat'] ) ) ? $_POST['lat'] : $exploded_start_latlng[0];
         $myformlng = ( isset( $_POST['lng'] ) && !empty( $_POST['lng'] ) ) ? $_POST['lng'] : $exploded_start_latlng[1];
 
-pre_debug($myformlng);
-pre_debug($myformlat);
+        $radius = ( $aka_store_setting['distance_unit'] == 'km' ) ? 6371 : 3959;
+        $store_data = array();
+
         $aka_saved_locators = get_post_meta( $post_id, 'aka_saved_locators', true );
         if ( !empty( $aka_saved_locators ) ) {
-pre_debug('1');
-        //     foreach ($aka_saved_locators as $store_key => $store_value) {
-        //         pre_debug('1');
-        //         $exploded_store_latlng = explode( ',', $store_value['aka_location_latn'] );
-        //         $store_lat = $exploded_store_latlng[0];
-        //         $store_lng = $exploded_store_latlng[1];
-        // pre_debug($store_lat);
-        // pre_debug($store_lng);
-        // pre_debug($store_key);
-        //     }
+            foreach ($aka_saved_locators as $store_key => $store_value) {
+                if ( $store_key < $stores_count) {
+
+                    $exploded_store_latlng = explode( ',', $store_value['aka_location_latn'] );
+                    $store_lat = $exploded_store_latlng[0];
+                    $store_lng = $exploded_store_latlng[1];
+
+                    $distance = $radius * acos( cos( deg2rad( $myformlat ) ) * cos( deg2rad( $store_lat ) ) * cos( deg2rad( $store_lng ) - deg2rad( $myformlng ) ) + sin( deg2rad( $myformlat ) ) * sin( deg2rad( $store_lat ) ) );
+
+                    if ( $distance <= $search_radius ) {
+                        $store_data[] = $aka_saved_locators[$store_key];
+                    }
+                }
+
+            }
+            wp_send_json( $store_data );
         }
         die();
 

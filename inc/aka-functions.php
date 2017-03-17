@@ -418,7 +418,7 @@ function aka_stores_default_settings() {
         'start_latlng'                  => '',
         'zoom_level'                    => 3,
         'max_zoom_level'                => 15,
-        'street_view'                   => 0,
+        'direction_view_control'        => 0,
         'map_type_control'              => 0,
         'scrollwheel_zoom'              => 1,
         'map_type'                      => 'roadmap',
@@ -453,14 +453,17 @@ function aka_stores_deregister_other_gmaps() {
 
     global $wp_scripts;
 
-    foreach ( $wp_scripts->registered as $index => $script ) {
+    if ( !empty( $wp_scripts->registered ) ) {
 
-        if ( ( strpos( $script->src, 'maps.google.com' ) !== false ) || ( strpos( $script->src, 'maps.googleapis.com' ) !== false ) && ( $script->handle !== 'aka-gmap' ) ) {
+        foreach ( $wp_scripts->registered as $index => $script ) {
 
-            wp_deregister_script( $script->handle );
+            if ( ( strpos( $script->src, 'maps.google.com' ) !== false ) || ( strpos( $script->src, 'maps.googleapis.com' ) !== false ) && ( $script->handle !== 'aka-gmap' ) ) {
+
+                wp_deregister_script( $script->handle );
+
+            }
 
         }
-
     }
 
 }
@@ -617,6 +620,10 @@ function aka_stores_get_link_title( $title, $url, $show_url ) {
 
     return $return_output;
 
+}
+
+function aka_radians($degrees){
+   return 0.0174532925 * $degrees;
 }
 
 

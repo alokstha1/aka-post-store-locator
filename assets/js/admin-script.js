@@ -125,7 +125,8 @@ jQuery(document).ready( function() {
         activateAutoComplete("aka-location");
     }
 
-
+    //initialize tab on backend
+    jQuery('#tabs-wrap').tabs();
 });
 
 function return_field_html( field_type, count) {
@@ -167,12 +168,19 @@ function return_field_html( field_type, count) {
 function activateAutoComplete(address) {
     var latlng,
         input = document.getElementById( address ),
-        options = {
-          types: ['geocode']
-        },
+        options = {},autocomplete;
+
+        if ( typeof aka_stores.aka_settings.region !== "undefined" && aka_stores.aka_settings.region.length > 0 ) {
+            var regionComponents = {};
+            regionComponents.country = aka_stores.aka_settings.region.toUpperCase();
+
+            options.componentRestrictions = regionComponents;
+
+        }
+
         autocomplete = new google.maps.places.Autocomplete( input, options );
 
-    google.maps.event.addListener( autocomplete, "place_changed", function() {
+    autocomplete.addListener( autocomplete, "place_changed", function() {
         latlng = autocomplete.getPlace().geometry.location;
         setLatlng( latlng, "zoom" );
     });

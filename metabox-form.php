@@ -94,10 +94,10 @@ $fields_count = ( isset( $aka_locators ) && !empty( $aka_locators ) ) ? count( $
                             ?>
                             <td>
                                 <span>
-                                    <?php echo $aka_value['aka_url']; ?>
+                                    <?php echo ( !empty( $aka_value['aka_url'] )  ) ? $aka_value['aka_url'] : '' ; ?>
 
                                 </span>
-                                <div class="aka-input-wrap"><input class="hidden" type="text" name="aka_store_meta[<?php echo $aka_key; ?>][aka_url]" value="<?php echo $aka_value['aka_url']; ?>">
+                                <div class="aka-input-wrap"><input class="hidden" type="text" name="aka_store_meta[<?php echo $aka_key; ?>][aka_url]" value="<?php echo ( !empty( $aka_value['aka_url'])  ) ? $aka_value['aka_url'] : '' ; ?>">
                                 </div>
                             </td>
                             <?php
@@ -106,10 +106,10 @@ $fields_count = ( isset( $aka_locators ) && !empty( $aka_locators ) ) ? count( $
                             ?>
                             <td>
                                 <span>
-                                    <?php echo $aka_value['aka_phone']; ?>
+                                    <?php echo ( !empty( $aka_value['aka_phone'] )  ) ? $aka_value['aka_phone'] : '' ; ?>
 
                                 </span>
-                                <div class="aka-input-wrap"><input class="hidden" type="text" name="aka_store_meta[<?php echo $aka_key; ?>][aka_phone]" value="<?php echo $aka_value['aka_phone']; ?>">
+                                <div class="aka-input-wrap"><input class="hidden" type="text" name="aka_store_meta[<?php echo $aka_key; ?>][aka_phone]" value="<?php echo ( !empty( $aka_value['aka_phone'] )  ) ? $aka_value['aka_phone'] : '' ; ?>">
                                 </div>
                             </td>
                             <?php
@@ -118,11 +118,11 @@ $fields_count = ( isset( $aka_locators ) && !empty( $aka_locators ) ) ? count( $
                             ?>
                             <td>
                                 <span>
-                                    <?php echo $aka_value['aka_description']; ?>
+                                    <?php echo ( !empty( $aka_value['aka_description'] )  ) ? $aka_value['aka_description'] : '' ; ?>
 
                                 </span>
                                 <div class="aka-input-wrap">
-                                    <textarea class="hidden" name="aka_store_meta[<?php echo $aka_key; ?>][aka_description]"><?php echo $aka_value['aka_description']; ?></textarea>
+                                    <textarea class="hidden" name="aka_store_meta[<?php echo $aka_key; ?>][aka_description]"><?php echo ( !empty( $aka_value['aka_description'] )  ) ? $aka_value['aka_description'] : '' ; ?></textarea>
                                 </div>
                             </td>
                             <?php
