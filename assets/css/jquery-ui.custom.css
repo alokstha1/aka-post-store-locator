@@ -88,7 +88,7 @@ AND ANY CHANGES MADE HERE WILL BE OVERWRITTEN.
 .ui-tabs[style] {
 	border: 1px solid #C2D7EF !important;
 	margin: 6px 0 0 !important;
-	swidth: 438px !important;
+	width: 438px !important;
 }
 
 .ui-tabs .ui-tabs-nav {

@@ -171,10 +171,10 @@ table#aka-newmeta > thead > tr > th.aka-del-edit, table#aka-newmeta > tbody > tr
     border-width: 1px 1px 0px 0px;
     border-style: solid solid none none;
     border-color: #EDEDED #EDEDED -moz-use-text-color -moz-use-text-color;
-    -moz-border-top-colors: none;
-    -moz-border-right-colors: none;
-    -moz-border-bottom-colors: none;
-    -moz-border-left-colors: none;
+    -moz-border-top-color: none;
+    -moz-border-right-color: none;
+    -moz-border-bottom-color: none;
+    -moz-border-left-color: none;
     border-image: none;
 }
 
@@ -194,3 +194,21 @@ table#aka-newmeta > thead > tr > th.aka-del-edit, table#aka-newmeta > tbody > tr
 .aka-button-delete {
     background-position: -64px -214px;
 }
+
+/*
+ * locator css 
+ -------------------------------------*/
+
+.aka-store-wrap .aka-left-wrap{
+    float: left;
+    width: 50%;
+}
+
+.aka-store-wrap .aka-right-wrap{
+    float: left;
+    width: 50%;
+}
+
+ .aka-store-wrap .aka-left-wrap ul.store-ul-lists{
+    list-style: none;
+ }
