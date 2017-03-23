@@ -3,7 +3,7 @@ if ( !defined( 'ABSPATH' ) ) exit;
 
 global $aka_store_setting;
 
-pre_debug($aka_store_setting);
+// pre_debug($aka_store_setting);
 
 ?>
 
@@ -21,10 +21,10 @@ pre_debug($aka_store_setting);
 
 
                 <ul class="nav-tab-wrapper">
-                <li><h2><a href="#map-api-container" class="nav-tab">Map Api</a></h2></li>
-                    <li><h2><a href="#map-setting-container" class="nav-tab">Social Options</a></h2></li>
-                    <li><h2><a href="#map-action-container" class="nav-tab">Social Options</a></h2></li>
-                    <li><h2><a href="#role-manager-container" class="nav-tab">Social Options</a></h2></li>
+                <li class="nav-tab"><h2><a href="#map-api-container" >Map Api</a></h2></li>
+                    <li class="nav-tab"><h2><a href="#map-setting-container" >General</a></h2></li>
+                    <li class="nav-tab"><h2><a href="#map-action-container" >Map Options</a></h2></li>
+                    <li class="nav-tab"><h2><a href="#role-manager-container" >Roles</a></h2></li>
                 </ul>
 
                 <?php if ( function_exists('wp_nonce_field') ) wp_nonce_field('aka_nonce_stores', 'validate_submit' ); ?>
@@ -33,7 +33,7 @@ pre_debug($aka_store_setting);
 
                     <div class="metabox-container">
 
-                        <div class="postbox">
+
                             <h3 class="hndle">
                                 <span><?php _e('Google Map Api', 'aka_stores' ); ?></span>
                             </h3>
@@ -77,7 +77,7 @@ pre_debug($aka_store_setting);
 
                             </div>
 
-                        </div>
+
 
                     </div>
 
@@ -87,7 +87,7 @@ pre_debug($aka_store_setting);
 
                     <div class="metabox-container">
 
-                        <div class="postbox">
+
                             <h3 class="hndle">
                                 <span><?php _e( 'General Map Setting', 'aka_stores' ); ?></span>
                             </h3>
@@ -161,7 +161,7 @@ pre_debug($aka_store_setting);
 
                             </div>
 
-                        </div>
+
 
                     </div>
 
@@ -171,9 +171,9 @@ pre_debug($aka_store_setting);
 
                     <div class="metabox-container">
 
-                        <div class="postbox">
+
                             <h3 class="hndle">
-                                <span><?php _e( 'Search', 'aka_stores' ); ?></span>
+                                <span><?php _e( 'Map Options', 'aka_stores' ); ?></span>
                             </h3>
                             <div class="inside">
                                 <p>
@@ -232,7 +232,7 @@ pre_debug($aka_store_setting);
                                 </p>
                             </div>
 
-                        </div>
+
 
                     </div>
 
@@ -242,7 +242,7 @@ pre_debug($aka_store_setting);
 
                     <div class="metabox-container">
 
-                        <div class="postbox">
+
                             <h3 class="hndle">
                                 <span><?php _e('Role Manager', 'aka_stores' ); ?></span>
                             </h3>
@@ -297,7 +297,7 @@ pre_debug($aka_store_setting);
                                     </label>
                                     <input type="checkbox" name="aka_store_setting[show_url_field]" id="show-url-field" value="" <?php checked( $aka_store_setting['show_url_field'], true ); ?> />
                                 </p>
-                            </div>
+
                         </div>
                     </div>
                 </div>
