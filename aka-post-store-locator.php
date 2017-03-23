@@ -24,13 +24,13 @@ if ( !class_exists('Aka_Stores') ) {
         * Class constructor
         */
         function __construct() {
-            $this->define_constants();
-            $this->includes();
-            $this->plugin_setting();
+            $this->aka_define_constants();
+            $this->aka_includes();
+            $this->aka_plugin_setting();
 
-            add_action( 'admin_init', array( $this, 'register_settings' ) );
+            add_action( 'admin_init', array( $this, 'aka_register_settings' ) );
 
-            add_action( 'admin_menu', array( $this, 'register_submenu_page' ) );
+            add_action( 'admin_menu', array( $this, 'aka_register_menu_page' ) );
             global $aka_store_setting;
             $aka_store_setting = get_option('aka_store_options');
 
@@ -51,7 +51,7 @@ if ( !class_exists('Aka_Stores') ) {
         /*
         * Define Plugin Constants.
         */
-        public function define_constants() {
+        public function aka_define_constants() {
 
             if ( !defined( 'AKA_STORE_VERSION' ) )
                 define( 'AKA_STORE_VERSION', '1.0.0' );
@@ -69,7 +69,7 @@ if ( !class_exists('Aka_Stores') ) {
         /*
         * Set admin form default value.
         */
-        public function plugin_setting() {
+        public function aka_plugin_setting() {
 
             global $aka_store_default_setting;
             $aka_store_default_setting = aka_stores_default_settings();
@@ -124,29 +124,29 @@ if ( !class_exists('Aka_Stores') ) {
         /*
         * Add menu page.
         */
-        public function register_submenu_page() {
-            add_menu_page( 'Store Settings', 'Store Settings', 'manage_options', 'aka_stores.php', array($this, 'add_setting_page' ), '', 20 );
+        public function aka_register_menu_page() {
+            add_menu_page( 'Store Settings', 'Store Settings', 'manage_options', 'aka_stores.php', array($this, 'aka_add_setting_page' ), '', 20 );
         }
 
         /*
         * Callback function of add_menu_page. Displays the page's content.
         */
-        public function add_setting_page() {
+        public function aka_add_setting_page() {
 
             require AKA_STORE_PLUGIN_DIR.'store-settings-form-new.php';
 
         }
 
-        public function register_settings() {
+        public function aka_register_settings() {
 
-            register_setting( 'aka_store_options', 'aka_store_options', array( $this, 'sanitize_settings' ) );
+            register_setting( 'aka_store_options', 'aka_store_options', array( $this, 'aka_sanitize_settings' ) );
 
         }
 
         /*
         * Save admin form settings value to aka_store_option option.
         */
-        public function sanitize_settings() {
+        public function aka_sanitize_settings() {
 
             if ( !isset( $_POST['validate_submit'] ) && !wp_verify_nonce( $_POST['validate_submit'], 'aka_nonce_stores' ) )
                 return false;
@@ -254,7 +254,7 @@ if ( !class_exists('Aka_Stores') ) {
         /*
         * Includes certain functions from aka-functions.php.
         */
-        public function includes() {
+        public function aka_includes() {
 
             require_once( AKA_STORE_PLUGIN_DIR. 'inc/aka-functions.php' );
 
@@ -272,7 +272,7 @@ if ( !class_exists('Aka_Stores') ) {
 
                 foreach ($option_postTypes as $type_value) {
 
-                    add_meta_box( 'meta-box-id', __( 'AKA Stores Box', 'aka_stores' ), array( $this, 'wpdocs_my_display_callback' ), $type_value );
+                    add_meta_box( 'meta-box-id', __( 'AKA Stores Box', 'aka_stores' ), array( $this, 'aka_display_metabox' ), $type_value );
                 }
             }
 
@@ -281,7 +281,7 @@ if ( !class_exists('Aka_Stores') ) {
         /*
         * Callback function displaying form elements to add_meta_box.
         */
-        public function wpdocs_my_display_callback() {
+        public function aka_display_metabox() {
 
             require AKA_STORE_PLUGIN_DIR.'metabox-form.php';
 
@@ -333,8 +333,7 @@ if ( !class_exists('Aka_Stores') ) {
 
                         <?php
                         foreach ( $aka_saved_locators as $aka_key => $store_value ) {
-                            // pre_debug($store_value);
-                            // pre_debug($aka_key);
+
                             $sn = $aka_key;
 
                             ?>
@@ -454,9 +453,10 @@ if ( !class_exists('Aka_Stores') ) {
      */
     function aka_store_search() {
         global $aka_store_setting;
-        // pre_debug($aka_store_setting);
+
         $exploded_start_latlng = explode( ',', $aka_store_setting['start_latlng'] );
         $post_id = $_POST['post_id'];
+
         $search_radius = $_POST['search_radius'];
         $stores_count = $_POST['stores_count'];
 

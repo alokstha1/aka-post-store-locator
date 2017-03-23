@@ -533,6 +533,7 @@ function aka_stores_return_form_el( $name, $type ) {
 
 /*
 * Max auto zoom level
+* @param string $max_value from database
 */
 function aka_stores_max_map_zoom_levels( $max_value ) {
 
@@ -565,6 +566,7 @@ function aka_stores_max_map_zoom_levels( $max_value ) {
 /**
  * Create a dropdown list holding the search radius or
  * max search results options.
+ * @param $list_type either Search Results or Maximum no of result values
  */
 function aka_stores_get_dropdown_list( $list_type ) {
 
@@ -599,7 +601,9 @@ function aka_stores_get_dropdown_list( $list_type ) {
 
 
 /*
-@since
+* @param $title String Title of locator
+* @param $url String Url Added to the locator
+* @param $show_url boolean
 */
 function aka_stores_get_link_title( $title, $url, $show_url ) {
 
@@ -620,10 +624,6 @@ function aka_stores_get_link_title( $title, $url, $show_url ) {
 
     return $return_output;
 
-}
-
-function aka_radians($degrees){
-   return 0.0174532925 * $degrees;
 }
 
 
