@@ -1,0 +1,10 @@
+aside.aka-left-wrap{
+	float: left;
+	width: 50%;
+	overflow: hidden;
+}
+
+aside.aka-right-wrap{
+	float: left;
+	width: 50%;
+}

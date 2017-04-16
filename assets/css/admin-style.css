@@ -230,20 +230,8 @@ ul.nav-tab-wrapper li.ui-tabs-active {
     font-weight: 600;
 }
 
-/*
- * locator css
- -------------------------------------*/
 
- .aka-store-wrap .aka-left-wrap{
-    float: left;
-    width: 50%;
-}
-
-.aka-store-wrap .aka-right-wrap{
-    float: left;
-    width: 50%;
-}
-
-.aka-store-wrap .aka-left-wrap ul.store-ul-lists{
-    list-style: none;
+input[type=radio],
+input[type=checkbox]{
+    margin-top: 0;
 }
