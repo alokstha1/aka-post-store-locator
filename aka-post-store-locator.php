@@ -106,7 +106,7 @@ if ( !class_exists('Aka_Stores') ) {
 
             aka_stores_deregister_other_gmaps();
 
-            wp_enqueue_script( 'aka-front-style', AKA_STORE_URL.'assets/css/aka-front-style.css');
+            wp_enqueue_style( 'aka-front-style', AKA_STORE_URL.'assets/css/aka-front-style.css');
 
             wp_enqueue_script( 'aka-gmap', '//maps.google.com/maps/api/js' . aka_stores_gmap_api_params('browser_key'), false, AKA_STORE_VERSION, true );
 
