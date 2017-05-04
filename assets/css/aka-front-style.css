@@ -1,13 +1,28 @@
+#primary{
+	width: 100% !important;
+}
+
+.has-sidebar #secondary{
+	display: none !important;
+}
+
 aside.aka-left-wrap{
 	float: left;
 	width: 50%;
-	overflow: hidden;
+	height: calc(100vh - 90px);
+    -ms-overflow-y: scroll;
+    overflow-y: scroll;
+    position: relative;
 }
 
 aside.aka-right-wrap{
 	float: right;
 	width: 50%;
+
+    overflow: hidden;
+    padding-left: 15px;
 }
+
 
 /*map wrapper*/
 .aka-map-wrap {
@@ -60,3 +75,75 @@ li.store-items {
     text-indent: 0;
 }
 /*end of  results lists*/
+=======
+
+aside.aka-left-wrap ul li{
+	margin: 15px 0;
+}
+
+aside.aka-left-wrap ul li:first-child{
+	margin-top: 0;
+}
+
+aside.aka-left-wrap ul li:last-child{
+	margin-bottom: 0;
+}
+
+.aka-select-wrap{
+	margin-top: 15px;
+	overflow: hidden;
+	width: 100%;
+}
+
+#aka-radius{
+	float: left;
+	padding-right: 10px;
+	width: 50%;
+}
+
+#aka-results{
+	float: left;
+	width: 50%;
+	padding-left: 10px;
+}
+
+.aka-dropdown{
+	width: 100%;
+}
+
+.aka-dropdown select{
+	width: 100%;
+}
+
+.aka-search-btn-wrap{
+	margin: 15px 0;
+}
+
+#aka-map{
+	height: calc(100vh - 330px) !important;
+}
+
+
+.store-items a.aka-get-direction{
+	-webkit-box-shadow: none;
+	        box-shadow: none;
+}
+
+.store-items a.aka-get-direction:hover{
+	-webkit-box-shadow: none;
+	        box-shadow: none;
+}
+
+.aka-direction-before a.aka-back{
+	-webkit-box-shadow: none;
+	        box-shadow: none;
+	display: block;
+	margin-bottom: 10px;
+	text-decoration: none;
+}
+
+.aka-direction-before a.aka-back:hover{
+	-webkit-box-shadow: none;
+	        box-shadow: none;
+}
+>>>>>>> 8f19bf8af67a96cf2b98c27d7239e42a9a46a840
