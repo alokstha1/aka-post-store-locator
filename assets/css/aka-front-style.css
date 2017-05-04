@@ -5,6 +5,58 @@ aside.aka-left-wrap{
 }
 
 aside.aka-right-wrap{
-	float: left;
+	float: right;
 	width: 50%;
 }
+
+/*map wrapper*/
+.aka-map-wrap {
+	float: right;
+	width: 99%;
+}
+
+/*Search form*/
+#aka-search-wrap {
+	margin-bottom: 12px;
+	padding: 12px 12px 0;
+	background: #f4f3f3;
+}
+
+/*search form elements*/
+.aka-input , .aka-search-btn-wrap{
+    padding: 10px;
+}
+
+#aka-results {
+    width: 50%;
+    display: inline-block;
+    padding: 10px;
+}
+
+#aka-radius {
+    width: 49%;
+    display: inline-block;
+    padding: 10px;
+}
+
+select#aka-radius-dropdown, select#aka-results-dropdown {
+    width: 100%;
+}
+
+.aka-search-btn-wrap {
+    display: block;
+}
+/*end fo Search form*/
+
+/*results lists*/
+li.store-items {
+    position: relative;
+    width: 100%;
+    padding: 10px;
+    border-bottom: 1px dotted #ccc;
+    margin-left: 0;
+    overflow: hidden;
+    list-style: none !important;
+    text-indent: 0;
+}
+/*end of  results lists*/
