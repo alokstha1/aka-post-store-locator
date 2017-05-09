@@ -58,11 +58,11 @@ select#aka-radius-dropdown, select#aka-results-dropdown {
 
 aside.aka-left-wrap{
 	float: left;
-	width: 50%;
 	height: calc(100vh - 200px);
     -ms-overflow-y: scroll;
-    overflow-y: scroll;
+    	overflow-y: scroll;
     position: relative;
+	width: 50%;
 }
 
 .aka-left-wrap ul{
@@ -119,7 +119,7 @@ ul.store-ul-lists li span.store-items{
 .store-items a.aka-get-direction{
 	-webkit-box-shadow: none;
 	        box-shadow: none;
-	   position: relative;
+	position: relative;
 	-webkit-transition: all 0.15s ease;
 	   -moz-transition: all 0.15s ease;
 	    -ms-transition: all 0.15s ease;
@@ -205,9 +205,9 @@ ul.store-ul-lists li span.store-items{
 
 aside.aka-right-wrap{
 	float: right;
-	width: 50%;
     overflow: hidden;
     padding-left: 10px;
+	width: 50%;
 }
 
 .aka-map-wrap {
@@ -216,4 +216,25 @@ aside.aka-right-wrap{
 
 #aka-map{
 	height: calc(100vh - 200px) !important;
+}
+
+
+@media screen and (max-width: 480px){
+	aside.aka-left-wrap{
+		float: none;
+		height: calc(100vh - 200px);
+		margin-top: 20px;
+		padding-left: 0px;
+		width: 100%;
+	}
+
+	aside.aka-right-wrap{
+		float: none;
+		width: 100%;
+	}
+
+	#aka-map{
+		height: 50vh !important;
+	}
+	
 }
