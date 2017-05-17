@@ -1,13 +1,9 @@
 <?php
-
 /*
 * Returns map api url based on languare and regions set.
 */
 function aka_stores_gmap_api_params( $api_key_type, $geocode_params = false ) {
-
     global $aka_store_setting;
-
-
     $api_params = '';
     $param_keys = array( 'language', 'region', 'key' );
 
@@ -19,7 +15,6 @@ function aka_stores_gmap_api_params( $api_key_type, $geocode_params = false ) {
     $first_sep = ( $geocode_params ) ? '&' : '?';
 
     foreach ( $param_keys as $param_key ) {
-
         if ( $param_key == 'key' ) {
             $option_key = $api_key_type;
         } else {
@@ -31,7 +26,6 @@ function aka_stores_gmap_api_params( $api_key_type, $geocode_params = false ) {
         if ( !empty( $param_val ) ) {
             $api_params .= $param_key . '=' . $param_val . '&';
         }
-
     }
 
     if ( $api_params ) {
@@ -49,15 +43,12 @@ function aka_stores_gmap_api_params( $api_key_type, $geocode_params = false ) {
 * Return Map zoom level dropdown setting for admin.
 */
 function aka_stores_map_zoom_levels( $saved_zoom_level = '' ) {
-
     $select_dropdown = '<select id="zoom-level" name="aka_store_setting[zoom_level]" autocomplete="off">';
 
     for ( $i = 1; $i < 13; $i++ ) {
-
         $selected = '';
 
         if ( isset( $saved_zoom_level ) && !empty( $saved_zoom_level ) ) {
-
             $selected = ( $saved_zoom_level == $i ) ? 'selected="selected"' : '';
         }
 
@@ -77,21 +68,16 @@ function aka_stores_map_zoom_levels( $saved_zoom_level = '' ) {
             default:
             $zoom_desc = '';
         }
-
         $select_dropdown .= "<option value='$i' $selected>". $i . esc_html( $zoom_desc ) . "</option>";
     }
-
     $select_dropdown .= "</select>";
-
     return $select_dropdown;
 }
-
 
 /*
 * Return google map type dropdown.
 */
 function aka_stores_map_type_options( $saved_map_type = '' ) {
-
     $map_types = array(
         'roadmap'   => __( 'Roadmap', 'aka_stores' ),
         'satellite' => __( 'Satellite', 'aka_stores' ),
@@ -113,7 +99,6 @@ function aka_stores_map_type_options( $saved_map_type = '' ) {
 * Return language and region setting dropdown for admin setting.
 */
 function aka_stores_api_option_lists( $list, $list_option_value = '' ) {
-
     switch ( $list ) {
         case 'language':
         $api_option_list = array (
@@ -387,16 +372,12 @@ function aka_stores_api_option_lists( $list, $list_option_value = '' ) {
 }
 
 if ( !empty( $api_option_list ) && is_array( $api_option_list ) ) {
-
     $option_lists = '';
 
     foreach ($api_option_list as $option_api_key => $api_list_value) {
-
         $selected = ( $list_option_value == $api_list_value ) ? 'selected="selected"' : '';
-
         $option_lists .= '<option value="'.esc_attr( $api_list_value ).'" '.$selected.'>'.esc_html( $option_api_key ).'</option>';
     }
-
 }
 return $option_lists;
 }
@@ -406,7 +387,6 @@ return $option_lists;
 * Return default admin form setting.
 */
 function aka_stores_default_settings() {
-
     $default_setting = array(
         'server_key'                    => '',
         'browser_key'                   => '',
@@ -437,9 +417,7 @@ function aka_stores_default_settings() {
     $settings = get_option('aka_store_options');
 
     if ( empty( $settings ) ) {
-
         update_option( 'aka_store_options', $default_setting );
-
     }
 
     return $default_setting;
@@ -450,22 +428,14 @@ function aka_stores_default_settings() {
 * Deregister other Google Map
 */
 function aka_stores_deregister_other_gmaps() {
-
     global $wp_scripts;
-
     if ( !empty( $wp_scripts->registered ) ) {
-
         foreach ( $wp_scripts->registered as $index => $script ) {
-
             if ( ( strpos( $script->src, 'maps.google.com' ) !== false ) || ( strpos( $script->src, 'maps.googleapis.com' ) !== false ) && ( $script->handle !== 'aka-gmap' ) ) {
-
                 wp_deregister_script( $script->handle );
-
             }
-
         }
     }
-
 }
 
 /*
@@ -480,19 +450,14 @@ function aka_stores_get_default_setting( $setting ) {
  * Get the latlng for the provided address.
  */
 function aka_stores_get_address_latlng( $address ) {
-
     $latlng   = '';
     $response = aka_stores_call_geocode_api( $address );
-
-
     if ( !is_wp_error( $response ) ) {
         $response = json_decode( $response['body'], true );
-
         if ( $response['status'] == 'OK' ) {
             $latlng = $response['results'][0]['geometry']['location']['lat'] . ',' . $response['results'][0]['geometry']['location']['lng'];
         }
     }
-
     return $latlng;
 }
 
@@ -502,41 +467,16 @@ function aka_stores_get_address_latlng( $address ) {
  * @return array $response Either a WP_Error or the response from the Geocode API.
  */
 function aka_stores_call_geocode_api( $address ) {
-
     $url      = 'https://maps.googleapis.com/maps/api/geocode/json?address=' . urlencode( $address ) . aka_stores_gmap_api_params( 'server_key', true );
-
     $response = wp_remote_get( $url );
-
     return $response;
 }
-
-
-/*
-* @param string $name The name of form field.
-* @param string $type Type of form field
-* @return $field_html form html from a type
-*/
-function aka_stores_return_form_el( $name, $type ) {
-
-    $field_html = '';
-    if ( $type == 'text' ) {
-        $field_html = '<input type="'. $type .'" name="aka_store_fields[1]['. sanitize_title( $name ) .']">';
-    } elseif ( $type == 'url' ) {
-        $field_html = '<input type="text" name="'. sanitize_title( $name ) .'">';
-    } elseif ( $type == 'textarea') {
-        $field_html = '<textarea name="aka_store_fields[1]['. sanitize_title( $name ) .']" rows="4" cols="20"></textarea>';
-    }
-
-    return $field_html;
-}
-
 
 /*
 * Max auto zoom level
 * @param string $max_value from database
 */
 function aka_stores_max_map_zoom_levels( $max_value ) {
-
     $max_zoom_levels = array();
     $zoom_level = array(
         'min' => 10,
@@ -556,9 +496,7 @@ function aka_stores_max_map_zoom_levels( $max_value ) {
         $selected = ( $max_value == $value ) ? 'selected="selected"' : '';
         $dropdown .= "<option value='" . esc_attr( $value ) . "' $selected>" . esc_html( $value ) . "</option>";
     }
-
     $dropdown .= '</select>';
-
     return $dropdown;
 }
 
@@ -569,10 +507,7 @@ function aka_stores_max_map_zoom_levels( $max_value ) {
  * @param $list_type either Search Results or Maximum no of result values
  */
 function aka_stores_get_dropdown_list( $list_type ) {
-
     global $aka_store_setting;
-    // pre_debug($aka_store_setting,);
-
     $dropdown_list = '';
     $settings      = explode( ',', $aka_store_setting[$list_type] );
 
@@ -606,9 +541,7 @@ function aka_stores_get_dropdown_list( $list_type ) {
 * @param $show_url boolean
 */
 function aka_stores_get_link_title( $title, $url, $show_url ) {
-
     $return_output = array();
-
     $return_output['before_wrap'] = '';
     $return_output['after_wrap'] = '';
 
@@ -621,9 +554,7 @@ function aka_stores_get_link_title( $title, $url, $show_url ) {
         $return_output['title'] = $title;
         $return_output['after_wrap'] = '';
     }
-
     return $return_output;
-
 }
 
 

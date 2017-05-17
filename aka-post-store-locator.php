@@ -20,7 +20,6 @@ if ( !class_exists('Aka_Stores') ) {
 
     class Aka_Stores {
 
-
         /*
         * Class constructor
         */
@@ -40,14 +39,11 @@ if ( !class_exists('Aka_Stores') ) {
             add_action( 'add_meta_boxes', array( $this, 'aka_stores_meta_boxes' ) );
             add_action( 'wp_ajax_return_address_latlng', array( $this, 'aka_stores_return_address_latlng' ) );
             add_action( 'wp_ajax_nopriv_return_address_latlng', array( $this, 'aka_stores_return_address_latlng' ) );
-
             add_action( 'save_post', array( $this, 'aka_stores_save_posts' ) );
             add_shortcode( 'aka-stores', array( $this, 'aka_list_stores') );
-
             add_action( 'wp_ajax_aka_store_search', array( $this, 'aka_store_search' ) );
             add_action( 'wp_ajax_nopriv_aka_store_search', array( $this, 'aka_store_search' ) );
         }
-
 
         /*
         * Define Plugin Constants.
@@ -71,7 +67,6 @@ if ( !class_exists('Aka_Stores') ) {
         * Set admin form default value.
         */
         public function aka_plugin_setting() {
-
             global $aka_store_default_setting;
             $aka_store_default_setting = aka_stores_default_settings();
         }
@@ -80,7 +75,6 @@ if ( !class_exists('Aka_Stores') ) {
         * Enqueue required admin styles and scripts.
         */
         public function aka_stores_admin_scripts_style() {
-
             global $aka_store_setting;
 
             wp_enqueue_style( 'admin-style', AKA_STORE_URL.'assets/css/admin-style.css' );
@@ -102,7 +96,6 @@ if ( !class_exists('Aka_Stores') ) {
 
 
         public function aka_stores_add_scripts_style() {
-
             global $aka_store_setting;
 
             aka_stores_deregister_other_gmaps();
@@ -133,13 +126,11 @@ if ( !class_exists('Aka_Stores') ) {
         * Callback function of add_menu_page. Displays the page's content.
         */
         public function aka_add_setting_page() {
-
             require AKA_STORE_PLUGIN_DIR.'store-settings-form-new.php';
 
         }
 
         public function aka_register_settings() {
-
             register_setting( 'aka_store_options', 'aka_store_options', array( $this, 'aka_sanitize_settings' ) );
 
         }
@@ -148,11 +139,8 @@ if ( !class_exists('Aka_Stores') ) {
         * Save admin form settings value to aka_store_option option.
         */
         public function aka_sanitize_settings() {
-
             if ( !isset( $_POST['validate_submit'] ) && !wp_verify_nonce( $_POST['validate_submit'], 'aka_nonce_stores' ) )
                 return false;
-
-
             $input_options = array();
             global $aka_store_setting;
 
@@ -171,7 +159,6 @@ if ( !class_exists('Aka_Stores') ) {
             $input_options['no_of_locations'] = isset( $_POST['aka_store_setting']['no_of_locations'] ) ? 1 : 0;
 
             $input_options['start_point'] = sanitize_text_field( $_POST['aka_store_setting']['start_point'] );
-
 
             // If no location name is then we also empty the latlng values from the hidden input field.
             if ( empty( $input_options['start_point'] ) ) {
@@ -247,7 +234,6 @@ if ( !class_exists('Aka_Stores') ) {
                 $input_options['show_url_field'] = isset( $_POST['aka_store_setting']['show_url_field'] ) ? 1 : 0;
                 $input_options['show_phone_field'] = isset( $_POST['aka_store_setting']['show_phone_field'] ) ? 1 : 0;
                 $input_options['show_description_field'] = isset( $_POST['aka_store_setting']['show_description_field'] ) ? 1 : 0;
-
                 return $input_options;
 
             }
@@ -256,18 +242,14 @@ if ( !class_exists('Aka_Stores') ) {
         * Includes certain functions from aka-functions.php.
         */
         public function aka_includes() {
-
             require_once( AKA_STORE_PLUGIN_DIR. 'inc/aka-functions.php' );
-
         }
 
         /*
         * Add meta box to selected post types.
         */
         public function aka_stores_meta_boxes() {
-
             global $aka_store_setting;
-
             if ( !empty( $aka_store_setting['post_type'] ) && isset( $aka_store_setting['post_type'] ) ) {
                 $option_postTypes = $aka_store_setting['post_type'];
 
@@ -283,13 +265,10 @@ if ( !class_exists('Aka_Stores') ) {
         * Callback function displaying form elements to add_meta_box.
         */
         public function aka_display_metabox() {
-
             require AKA_STORE_PLUGIN_DIR.'metabox-form.php';
-
         }
 
         public function aka_stores_return_address_latlng() {
-
             if ( isset( $_POST['location'] ) && !empty( $_POST['location'] ) ) {
                 $location = aka_stores_get_address_latlng($_POST['location']);
                 echo $location;
@@ -300,16 +279,13 @@ if ( !class_exists('Aka_Stores') ) {
         public function aka_stores_save_posts( $post_id ) {
 
             if ( isset( $_POST['aka_store_meta'] ) && !empty( $_POST['aka_store_meta'] ) ) {
-
                 update_post_meta( $post_id, 'aka_saved_locators', array_values( $_POST['aka_store_meta'] ) );
             } else {
                 update_post_meta( $post_id, 'aka_saved_locators', '' );
             }
-
         }
 
         public function aka_list_stores( $atts ) {
-
             global $aka_store_setting;
 
             $values = shortcode_atts( array(
@@ -358,9 +334,6 @@ if ( !class_exists('Aka_Stores') ) {
             </div>
 
             <aside class="aka-right-wrap">
-
-
-
                 <div class="aka-map-wrap">
                     <div id="aka-map" style="height: 418px;"></div>
                 </div>

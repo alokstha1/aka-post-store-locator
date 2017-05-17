@@ -1,7 +1,6 @@
 jQuery(document).ready( function() {
 
     //not needed: var resetMap,
-
     var map, geocoder, displayDirection, serviceDirections, startMarkerData, infoWindow, autoCompleteLatLng,
     openInfoWindow = [],
     markersArray = [],
@@ -27,7 +26,6 @@ jQuery(document).ready( function() {
         displayDirection = new google.maps.DirectionsRenderer();
         serviceDirections = new google.maps.DirectionsService();
 
-
         // Set map options.
         mapOptions = {
             zoom: Number( aka_stores.aka_settings.zoom_level ),
@@ -35,7 +33,6 @@ jQuery(document).ready( function() {
             mapTypeId: google.maps.MapTypeId[ aka_stores.aka_settings.map_type.toUpperCase() ],
             mapTypeControl: Number( aka_stores.aka_settings.map_type_control ) ? true : false,
             scrollwheel: Number( aka_stores.aka_settings.scrollwheel_zoom ) ? true : false,
-
         };
 
         map = new google.maps.Map(document.getElementById('aka-map'), mapOptions );
@@ -49,7 +46,7 @@ jQuery(document).ready( function() {
         }
 
         bounds        = new google.maps.LatLngBounds();
-        addMarker( startLatLng, '', false, infoWindow );
+        addMarker( startLatLng, null, false, infoWindow );
         bounds.extend( startLatLng );
 
         //loop over the store items and add map marker
@@ -82,7 +79,6 @@ jQuery(document).ready( function() {
         //initialize render direction event
         render_direction();
 
-
     }
 
     function initAutocomplete() {
@@ -109,7 +105,6 @@ jQuery(document).ready( function() {
                  * Assign the returned latlng to the autoCompleteLatLng var.
                  * This var is used when the users submits the search.
                  */
-
                  if ( place.geometry ) {
                     autoCompleteLatLng = place.geometry.location;
 
@@ -128,14 +123,12 @@ jQuery(document).ready( function() {
             /*
              * Use coordinates from the default start point defined or we set it to 0,0
              */
-
              if ( aka_stores.aka_settings.start_latlng !== "" ) {
                 latLng      = aka_stores.aka_settings.start_latlng.split( "," );
                 startLatLng = new google.maps.LatLng( latLng[0], latLng[1] );
             } else {
                 startLatLng = new google.maps.LatLng( 0,0 );
             }
-
             return startLatLng;
         }
 
@@ -151,12 +144,10 @@ jQuery(document).ready( function() {
          * @return {void}
          */
          function addMarker( latLng, storeId, draggable, infoWindow ) {
-
             var url, mapIcon, marker,
             keepStartMarker = true;
 
-            if ( storeId === '' ) {
-
+            if ( storeId == null ) {
                 url = aka_stores.marker_dir_url + 'red.png';
                 mapIcon = {
                     url: url,
@@ -174,8 +165,6 @@ jQuery(document).ready( function() {
                 };
             }
 
-
-
             marker = new google.maps.Marker({
                 position: latLng,
                 map: map,
@@ -186,9 +175,8 @@ jQuery(document).ready( function() {
                 icon: mapIcon
             });
 
-            if ( storeId === '') {
+            if ( storeId == null) {
                 startMarkerData = marker;
-                console.log(startMarkerData);
             }
 
             // Store the marker for later use.
@@ -196,28 +184,19 @@ jQuery(document).ready( function() {
 
             google.maps.event.addListener( marker, "click",( function( currentMap ) {
                 return function() {
-
                     if ( storeId !== '') {
                         setInfoWindowContent( storeId, marker, infoWindow, currentMap );
                         openInfoWindow.push( infoWindow );
                     }
 
-
                     google.maps.event.clearListeners( infoWindow, "domready" );
-
-                    // google.maps.event.addListener( infoWindow, "domready", function() {
-                    //     infoWindowClickActions( marker, currentMap );
-                    //     checkMaxZoomLevel();
-                    // });
                 };
             }( map ) ) );
-
 
             //marker bounce animation
             toggleMarkerAnimation();
 
         }
-
 
         /**
          * Set the correct info window content for the marker.
@@ -245,8 +224,6 @@ jQuery(document).ready( function() {
             // aka_stores.aka_settings
 
             var title_url_wrap = setTitleUrl(storeName, url, aka_stores.aka_settings.show_url_field);
-
-
             infoWindowContent += '<div class="aka-info-wrap">';
             infoWindowContent += '<span class="aka-title"><label>Title:</label>';
             infoWindowContent += title_url_wrap.before_wrap;
@@ -339,7 +316,6 @@ jQuery(document).ready( function() {
 
         }
 
-
         /**
          * Force the open InfoBox info window to close
          *
@@ -383,10 +359,6 @@ jQuery(document).ready( function() {
                 markersArray.length = 0;
             }
 
-            // If marker clusters exist, remove them from the map.
-            // if ( markerClusterer ) {
-            //     markerClusterer.clearMarkers();
-            // }
         }
 
 
@@ -448,7 +420,7 @@ jQuery(document).ready( function() {
             var autoLoad = false;
 
             // Add a new start marker.
-            addMarker( prepare_latLng, '', true, infoWindow );
+            addMarker( prepare_latLng, null, true, infoWindow );
 
             // Try to find stores that match the radius, location criteria.
             makeAjaxRequest( prepare_latLng, resetMap, autoLoad, infoWindow );
@@ -530,14 +502,11 @@ jQuery(document).ready( function() {
                         addMarker( response_latLng, index, false, infoWindow );
 
                     });
-
-
                     //Append items to lists.
                     storeList.html(result_html);
 
                     // Make sure we don't zoom to far.
                     fitBounds();
-
                     render_direction();
                 }
             });
@@ -550,22 +519,21 @@ jQuery(document).ready( function() {
           * @returns {void}
           */
           function geocodeErrors( status ) {
-           var msg;
+             var msg;
+             switch ( status ) {
+                case "ZERO_RESULTS":
+                msg = 'No results found';
+                break;
+                case "OVER_QUERY_LIMIT":
+                msg = 'API usage limit reached';
+                break;
+                default:
+                msg = 'Something went wrong, please try again!';
+                break;
+            }
 
-           switch ( status ) {
-            case "ZERO_RESULTS":
-            msg = 'No results found';
-            break;
-            case "OVER_QUERY_LIMIT":
-            msg = 'API usage limit reached';
-            break;
-            default:
-            msg = 'Something went wrong, please try again!';
-            break;
+            alert( msg );
         }
-
-        alert( msg );
-    }
 
 
          /**
@@ -575,10 +543,9 @@ jQuery(document).ready( function() {
           * @returns {void}
           */
           function fitBounds() {
-
-           var i, markerLen,
-           maxZoom = Number( aka_stores.aka_settings.max_zoom_level ),
-           bounds  = new google.maps.LatLngBounds();
+             var i, markerLen,
+             maxZoom = Number( aka_stores.aka_settings.max_zoom_level ),
+             bounds  = new google.maps.LatLngBounds();
 
              // Make sure we don't zoom to far.
              google.maps.event.addListenerOnce( map, "bounds_changed", function( event ) {
@@ -600,19 +567,15 @@ jQuery(document).ready( function() {
          *
          */
          function render_direction() {
-
             jQuery( "#aka-store-lists" ).on( "click", ".aka-get-direction", function() {
 
                 // Check if we need to render the direction on the map.
                 if ( aka_stores.aka_settings.direction_view_control == 1 ) {
                     renderDirections( jQuery( this ) );
-
                     return false;
                 }
             });
-
         }
-
 
          /**
           * Show the driving directions.
@@ -622,7 +585,7 @@ jQuery(document).ready( function() {
           * @returns {void}
           */
           function renderDirections( e ) {
-           var i, start, end, len, store_Id;
+             var i, start, end, len, store_Id;
 
             // Force the open InfoBox info window to close.
             closeInfoBoxWindow();
@@ -633,9 +596,7 @@ jQuery(document).ready( function() {
               */
               if ( e.parents( "li" ).length > 0 ) {
                 store_Id = e.parent().parent().closest( "li" ).data( "storeid" );
-             } /*else {
-                storeId = e.parents( ".wpsl-info-window" ).data( "store-id" );
-            }*/
+             }
 
             // Check if we need to get the start point from a dragged marker.
             if ( ( typeof( startMarkerData ) !== "undefined" )  && ( startMarkerData !== "" ) ) {
@@ -650,31 +611,20 @@ jQuery(document).ready( function() {
 
              // Find the latlng that belongs to the start and end point.
              for ( i = 0, len = markersArray.length; i < len; i++ ) {
-               // console.log(markersArray[i].getPosition().lat());
-
-                // Only continue if the start data is still empty or undefined.
-                /*if ( markersArray[i].storeId === '' ) {
-
-                    start = markersArray[i].getPosition();
-                } else */if ( markersArray[i].storeId === store_Id ) {
-                    end = markersArray[i].getPosition();
-                }
+              if ( markersArray[i].storeId === store_Id ) {
+                end = markersArray[i].getPosition();
             }
-            console.log(start);
-            console.log(end);
+        }
 
-            if ( start && end ) {
-                jQuery( "#aka-direction-details ul" ).empty();
-                // jQuery( ".wpsl-direction-before, .wpsl-direction-after" ).remove();
+        if ( start && end ) {
+            jQuery( "#aka-direction-details ul" ).empty();
                 calcRoute( start, end );
-
                 //Trigger click on back button to locations lists when directions are shown.
                 triggerLocationLists();
             } else {
                 alert( 'Something went wrong, please try again!' );
             }
         }
-
 
          /**
           * Calculate the route from the start to the end.
@@ -685,36 +635,32 @@ jQuery(document).ready( function() {
           * @returns {void}
           */
           function calcRoute( start, end ) {
+             var legs, len, step, index, direction, i, j, distanceUnit, directionOffset,
+             directionStops = "",
+             request = {};
 
+             if ( aka_stores.aka_settings.distance_unit == "km" ) {
+                distanceUnit = 'METRIC';
+            } else {
+                distanceUnit = 'IMPERIAL';
+            }
 
+            request = {
+                origin: start,
+                destination: end,
+                travelMode: 'DRIVING',
+                unitSystem: google.maps.UnitSystem[ distanceUnit ]
+            };
 
-           var legs, len, step, index, direction, i, j, distanceUnit, directionOffset,
-           directionStops = "",
-           request = {};
+            serviceDirections.route( request, function( response, status ) {
+                if ( status == google.maps.DirectionsStatus.OK ) {
+                    displayDirection.setMap( map );
+                    displayDirection.setDirections( response );
 
-           if ( aka_stores.aka_settings.distance_unit == "km" ) {
-            distanceUnit = 'METRIC';
-        } else {
-            distanceUnit = 'IMPERIAL';
-        }
+                    if ( response.routes.length > 0 ) {
+                        direction = response.routes[0];
 
-        request = {
-            origin: start,
-            destination: end,
-            travelMode: 'DRIVING',
-            unitSystem: google.maps.UnitSystem[ distanceUnit ]
-        };
-
-        serviceDirections.route( request, function( response, status ) {
-            console.log(response);
-            if ( status == google.maps.DirectionsStatus.OK ) {
-                displayDirection.setMap( map );
-                displayDirection.setDirections( response );
-
-                if ( response.routes.length > 0 ) {
-                    direction = response.routes[0];
-
-                    directionStops += "<li><div class='aka-direction-before'><a class='aka-back' id='aka-direction-start' href='#'>Back</a><div class='aka-distance-time'><span class='aka-total-distance'>" + direction.legs[0].distance.text + "</span> - <span class='aka-total-durations'>" + direction.legs[0].duration.text + "</span></div></div></li>";
+                        directionStops += "<li><div class='aka-direction-before'><a class='aka-back' id='aka-direction-start' href='#'>Back</a><div class='aka-distance-time'><span class='aka-total-distance'>" + direction.legs[0].distance.text + "</span> - <span class='aka-total-durations'>" + direction.legs[0].duration.text + "</span></div></div></li>";
 
                         // Loop over the legs and steps of the directions.
                         for ( i = 0; i < direction.legs.length; i++ ) {
@@ -741,22 +687,14 @@ jQuery(document).ready( function() {
                         if ( ( typeof( startMarkerData ) !== "undefined" ) && ( startMarkerData !== "" ) ) {
                             startMarkerData.setMap( null );
                         }
-
-
-                        // Make sure the start of the route directions are visible if the store listings are shown below the map.
-                        // if ( wpslSettings.templateId == 1 ) {
-                        //     directionOffset = $( "#wpsl-gmap" ).offset();
-                        //     $( window ).scrollTop( directionOffset.top );
-                        // }
                     }
                 } else {
                     geocodeErrors( status );
                 }
             });
-    }
+        }
 
-    function triggerLocationLists() {
-
+        function triggerLocationLists() {
              // Handle the click on the back button when the route directions are displayed.
              jQuery( "#aka-direction-detail" ).on( "click", ".aka-back", function() {
                 var i, len;
@@ -773,7 +711,6 @@ jQuery(document).ready( function() {
                 if ( ( typeof( startMarkerData ) !== "undefined" )  && ( startMarkerData !== "" ) ) {
                     startMarkerData.setMap( map );
                 }
-
 
                 map.setCenter( directionMarkerPosition.centerLatlng );
                 map.setZoom( directionMarkerPosition.zoomLevel );
@@ -798,11 +735,10 @@ jQuery(document).ready( function() {
                 letsAnimate( jQuery(this).data('storeid'), 'stop' );
             });
 
-         }
+        }
 
-
-         function letsAnimate( storeId, status ) {
-             var i, len, marker;
+        function letsAnimate( storeId, status ) {
+           var i, len, marker;
 
              // Find the correct marker to bounce based on the storeId.
              for ( i = 0, len = markersArray.length; i < len; i++ ) {
@@ -814,6 +750,6 @@ jQuery(document).ready( function() {
                         markersArray[i].setAnimation( null );
                     }
                 }
-             }
-         }
-     });
+            }
+        }
+    });
