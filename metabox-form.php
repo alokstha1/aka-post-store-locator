@@ -4,9 +4,7 @@ $aka_store_setting = get_option('aka_store_options');
 
 $aka_locators = get_post_meta( get_the_ID(), 'aka_saved_locators', true );
 $fields_count = ( isset( $aka_locators ) && !empty( $aka_locators ) ) ? count( $aka_locators ) : 0;
-echo "<pre>";
-print_r($aka_store_setting);
-echo "</pre>";
+
 
 ?>
 <div id="aka-store-stuff">
