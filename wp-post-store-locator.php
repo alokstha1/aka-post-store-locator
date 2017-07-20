@@ -1,12 +1,13 @@
 <?php
 /**
- * Plugin Name: WP Post's Store Locator
+ * Plugin Name: Store Locator for WordPress Posts
  * Plugin URI:
- * Description: A full-featured map maker & location management interface for creating any post store locator for a post type.
- * Version: 1.0.0
+ * Description:A full-featured map maker & location management interface for creating store locator for any posts of any post type.
+ * Version:1.0
  * Author: Alok Shrestha
- * Author URI:
- * Text Domain: aka_stores
+ * Author URI: http://alokshrestha.com.np
+ * Text Domain: aka-stores
+ * License:GPLv2 or later
  */
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly.
@@ -20,7 +21,7 @@ if ( !class_exists('Aka_Stores') ) {
 
     class Aka_Stores {
 
-        /*
+        /**
         * Class constructor
         */
         function __construct() {
@@ -31,8 +32,6 @@ if ( !class_exists('Aka_Stores') ) {
             add_action( 'admin_init', array( $this, 'aka_register_settings' ) );
 
             add_action( 'admin_menu', array( $this, 'aka_register_menu_page' ) );
-            global $aka_store_setting;
-            $aka_store_setting = get_option('aka_store_options');
 
             add_action( 'wp_enqueue_scripts', array( $this, 'aka_stores_add_scripts_style' ) );
             add_action( 'admin_enqueue_scripts', array( $this, 'aka_stores_admin_scripts_style' ) );
@@ -45,7 +44,7 @@ if ( !class_exists('Aka_Stores') ) {
             add_action( 'wp_ajax_nopriv_aka_store_search', array( $this, 'aka_store_search' ) );
         }
 
-        /*
+        /**
         * Define Plugin Constants.
         */
         public function aka_define_constants() {
@@ -63,7 +62,7 @@ if ( !class_exists('Aka_Stores') ) {
                 define( 'AKA_STORE_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
         }
 
-        /*
+        /**
         * Set admin form default value.
         */
         public function aka_plugin_setting() {
@@ -71,11 +70,12 @@ if ( !class_exists('Aka_Stores') ) {
             $aka_store_default_setting = aka_stores_default_settings();
         }
 
-        /*
+        /**
         * Enqueue required admin styles and scripts.
         */
         public function aka_stores_admin_scripts_style() {
-            global $aka_store_setting;
+            $aka_store_setting = get_option('aka_store_options');
+
 
             wp_enqueue_style( 'admin-style', AKA_STORE_URL.'assets/css/admin-style.css' );
 
@@ -94,9 +94,11 @@ if ( !class_exists('Aka_Stores') ) {
             );
         }
 
-
+        /**
+        *  Enqueue scripts for front-end
+        */
         public function aka_stores_add_scripts_style() {
-            global $aka_store_setting;
+            $aka_store_setting = get_option('aka_store_options');
 
             aka_stores_deregister_other_gmaps();
 
@@ -115,50 +117,55 @@ if ( !class_exists('Aka_Stores') ) {
 
         }
 
-        /*
+        /**
         * Add menu page.
         */
         public function aka_register_menu_page() {
-            add_menu_page( 'Store Settings', 'Store Settings', 'manage_options', 'aka_stores.php', array($this, 'aka_add_setting_page' ), '', 20 );
+            add_menu_page( __( 'Store Settings', 'aka-stores'), 'Store Settings', 'manage_options', 'aka_stores.php', array($this, 'aka_add_setting_page' ), '', 20 );
         }
 
-        /*
+        /**
         * Callback function of add_menu_page. Displays the page's content.
         */
         public function aka_add_setting_page() {
-            require AKA_STORE_PLUGIN_DIR.'store-settings-form-new.php';
+            require AKA_STORE_PLUGIN_DIR.'store-settings-form.php';
 
         }
 
+        /**
+        * Register settings options and save to wp_options table.
+        */
         public function aka_register_settings() {
             register_setting( 'aka_store_options', 'aka_store_options', array( $this, 'aka_sanitize_settings' ) );
 
         }
 
-        /*
+        /**
         * Save admin form settings value to aka_store_option option.
         */
         public function aka_sanitize_settings() {
-            if ( !isset( $_POST['validate_submit'] ) && !wp_verify_nonce( $_POST['validate_submit'], 'aka_nonce_stores' ) )
+            if ( !isset( $_POST['validate_submit'] ) || !wp_verify_nonce( $_POST['validate_submit'], 'aka_nonce_stores' ) )
                 return false;
             $input_options = array();
-            global $aka_store_setting;
+            $aka_store_setting = get_option('aka_store_options');
+
+            $store_post_array = stripslashes_deep( $_POST['aka_store_setting'] );
 
             //Map Api Section
-            $input_options['server_key'] = sanitize_text_field( $_POST['aka_store_setting']['server_key']);
+            $input_options['server_key'] = sanitize_text_field( $store_post_array['server_key']);
 
-            $input_options['browser_key'] = sanitize_text_field( $_POST['aka_store_setting']['browser_key']);
+            $input_options['browser_key'] = sanitize_text_field( $store_post_array['browser_key']);
 
-            $input_options['language'] = wp_filter_nohtml_kses( $_POST['aka_store_setting']['language'] );
-            $input_options['region'] = wp_filter_nohtml_kses( $_POST['aka_store_setting']['region'] );
+            $input_options['language'] = wp_filter_nohtml_kses( $store_post_array['language'] );
+            $input_options['region'] = wp_filter_nohtml_kses( $store_post_array['region'] );
             //End of Map Api Section
 
             //General Map Setting
-            $input_options['autolocate_users'] = isset( $_POST['aka_store_setting']['autolocate_users'] ) ? 1 : 0;
+            $input_options['autolocate_users'] = isset( $store_post_array['autolocate_users'] ) ? 1 : 0;
 
-            $input_options['no_of_locations'] = isset( $_POST['aka_store_setting']['no_of_locations'] ) ? 1 : 0;
+            $input_options['no_of_locations'] = isset( $store_post_array['no_of_locations'] ) ? 1 : 0;
 
-            $input_options['start_point'] = sanitize_text_field( $_POST['aka_store_setting']['start_point'] );
+            $input_options['start_point'] = sanitize_text_field( $store_post_array['start_point'] );
 
             // If no location name is then we also empty the latlng values from the hidden input field.
             if ( empty( $input_options['start_point'] ) ) {
@@ -174,41 +181,41 @@ if ( !class_exists('Aka_Stores') ) {
                      * Google Maps Autocomplete. So this code is only used as fallback to make sure
                      * the provided start location is always geocoded.
                      */
-                    if ( $aka_store_setting['start_point'] != $_POST['aka_store_setting']['start_point'] && $aka_store_setting['start_latlng'] == $_POST['aka_store_setting']['start_latlng'] || empty( $_POST['aka_store_setting']['start_latlng'] ) ) {
-                        $start_latlng = aka_stores_get_address_latlng( $_POST['aka_store_setting']['start_point'] );
+                    if ( $aka_store_setting['start_point'] != $store_post_array['start_point'] && $aka_store_setting['start_latlng'] == $store_post_array['start_latlng'] || empty( $store_post_array['start_latlng'] ) ) {
+                        $start_latlng = aka_stores_get_address_latlng( $store_post_array['start_point'] );
                     } else {
-                        $start_latlng = sanitize_text_field( $_POST['aka_store_setting']['start_latlng'] );
+                        $start_latlng = sanitize_text_field( $store_post_array['start_latlng'] );
                     }
 
                     $input_options['start_latlng'] = $start_latlng;
                 }
 
-                $input_options['zoom_level'] = $_POST['aka_store_setting']['zoom_level'];
+                $input_options['zoom_level'] = $store_post_array['zoom_level'];
 
-                $input_options['max_zoom_level'] = $_POST['aka_store_setting']['max_zoom_level'];
+                $input_options['max_zoom_level'] = $store_post_array['max_zoom_level'];
 
-                $input_options['direction_view_control'] = isset ($_POST['aka_store_setting']['direction_view_control'] ) ? 1 : 0;
+                $input_options['direction_view_control'] = isset ($store_post_array['direction_view_control'] ) ? 1 : 0;
 
-                $input_options['map_type_control'] = isset( $_POST['aka_store_setting']['map_type_control'] ) ? 1 : 0;
+                $input_options['map_type_control'] = isset( $store_post_array['map_type_control'] ) ? 1 : 0;
 
-                $input_options['scrollwheel_zoom'] = isset( $_POST['aka_store_setting']['scrollwheel_zoom'] ) ? 1 : 0;
+                $input_options['scrollwheel_zoom'] = isset( $store_post_array['scrollwheel_zoom'] ) ? 1 : 0;
 
-                $input_options['map_type'] = $_POST['aka_store_setting']['map_type'];
+                $input_options['map_type'] = $store_post_array['map_type'];
             //End of General Map Setting
 
             //Start of Search
-                $input_options['autocomplete'] = isset( $_POST['aka_store_setting']['autocomplete'] ) ? 1 : 0;
+                $input_options['autocomplete'] = isset( $store_post_array['autocomplete'] ) ? 1 : 0;
 
-                $input_options['radius_dropdown'] = isset( $_POST['aka_store_setting']['radius_dropdown'] ) ? 1 : 0;
+                $input_options['radius_dropdown'] = isset( $store_post_array['radius_dropdown'] ) ? 1 : 0;
 
-                $input_options['max_results_dropdown'] = isset( $_POST['aka_store_setting']['max_results_dropdown'] ) ? 1 : 0;
+                $input_options['max_results_dropdown'] = isset( $store_post_array['max_results_dropdown'] ) ? 1 : 0;
 
-                $input_options['distance_unit'] = ( $_POST['aka_store_setting']['distance_unit'] == 'km' ) ? 'km' : 'mi';
+                $input_options['distance_unit'] = ( $store_post_array['distance_unit'] == 'km' ) ? 'km' : 'mi';
 
 
             // Check for a valid max results value, otherwise we use the default.
-                if ( !empty( $_POST['aka_store_setting']['max_results'] ) ) {
-                    $input_options['max_results'] = sanitize_text_field( $_POST['aka_store_setting']['max_results'] );
+                if ( !empty( $store_post_array['max_results'] ) ) {
+                    $input_options['max_results'] = sanitize_text_field( $store_post_array['max_results'] );
                 } else {
                     $this->settings_error( 'max_results' );
                     $input_options['max_results'] = aka_stores_get_default_setting( 'max_results' );
@@ -216,8 +223,8 @@ if ( !class_exists('Aka_Stores') ) {
 
 
             // See if a search radius value exist, otherwise we use the default.
-                if ( !empty( $_POST['aka_store_setting']['radius_options'] ) ) {
-                    $input_options['radius_options'] = sanitize_text_field( $_POST['aka_store_setting']['radius_options'] );
+                if ( !empty( $store_post_array['radius_options'] ) ) {
+                    $input_options['radius_options'] = sanitize_text_field( $store_post_array['radius_options'] );
                 } else {
                     $this->settings_error( 'radius_options' );
                     $input_options['radius_options'] = aka_stores_get_default_setting( 'radius_options' );
@@ -225,43 +232,43 @@ if ( !class_exists('Aka_Stores') ) {
             //End of Search Section
 
             //Role Manager Section
-                if ( isset( $_POST['aka_store_setting']['post_type'] ) && !empty( $_POST['aka_store_setting']['post_type'] ) ) {
+                if ( isset( $store_post_array['post_type'] ) && !empty( $store_post_array['post_type'] ) ) {
 
-                    $input_options['post_type'] = $_POST['aka_store_setting']['post_type'];
+                    $input_options['post_type'] = $store_post_array['post_type'];
 
                 }
 
-                $input_options['show_url_field'] = isset( $_POST['aka_store_setting']['show_url_field'] ) ? 1 : 0;
-                $input_options['show_phone_field'] = isset( $_POST['aka_store_setting']['show_phone_field'] ) ? 1 : 0;
-                $input_options['show_description_field'] = isset( $_POST['aka_store_setting']['show_description_field'] ) ? 1 : 0;
+                $input_options['show_url_field'] = isset( $store_post_array['show_url_field'] ) ? 1 : 0;
+                $input_options['show_phone_field'] = isset( $store_post_array['show_phone_field'] ) ? 1 : 0;
+                $input_options['show_description_field'] = isset( $store_post_array['show_description_field'] ) ? 1 : 0;
                 return $input_options;
 
             }
 
-        /*
+        /**
         * Includes certain functions from aka-functions.php.
         */
         public function aka_includes() {
             require_once( AKA_STORE_PLUGIN_DIR. 'inc/aka-functions.php' );
         }
 
-        /*
+        /**
         * Add meta box to selected post types.
         */
         public function aka_stores_meta_boxes() {
-            global $aka_store_setting;
+            $aka_store_setting = get_option('aka_store_options');
             if ( !empty( $aka_store_setting['post_type'] ) && isset( $aka_store_setting['post_type'] ) ) {
                 $option_postTypes = $aka_store_setting['post_type'];
 
                 foreach ($option_postTypes as $type_value) {
 
-                    add_meta_box( 'meta-box-id', __( 'AKA Stores Box', 'aka_stores' ), array( $this, 'aka_display_metabox' ), $type_value );
+                    add_meta_box( 'meta-box-id', __( 'AKA Stores Box', 'aka-stores' ), array( $this, 'aka_display_metabox' ), $type_value );
                 }
             }
 
         }
 
-        /*
+        /**
         * Callback function displaying form elements to add_meta_box.
         */
         public function aka_display_metabox() {
@@ -276,6 +283,9 @@ if ( !class_exists('Aka_Stores') ) {
             die();
         }
 
+        /**
+        * Save stores- items meta
+        */
         public function aka_stores_save_posts( $post_id ) {
 
             if ( isset( $_POST['aka_store_meta'] ) && !empty( $_POST['aka_store_meta'] ) ) {
@@ -285,8 +295,11 @@ if ( !class_exists('Aka_Stores') ) {
             }
         }
 
+        /**
+        * Returns shortcode output
+        */
         public function aka_list_stores( $atts ) {
-            global $aka_store_setting;
+            $aka_store_setting = get_option('aka_store_options');
 
             $values = shortcode_atts( array(
                 'id'    => '',
@@ -305,11 +318,11 @@ if ( !class_exists('Aka_Stores') ) {
                 <div id="aka-search-wrap">
                     <form class="aka-search-form">
                         <div class="aka-input">
-                            <label for="aka-search-input">Location</label>
+                            <label for="aka-search-input"><?php _e('Location', 'aka-stores' ); ?></label>
                             <input id="aka-search-input" value="" name="aka-search-input" placeholder="" aria-required="true" autocomplete="off" type="text">
                         </div>
                         <div id="aka-radius">
-                            <label for="aka-radius-dropdown">Search Radius</label>
+                            <label for="aka-radius-dropdown"><?php _e('Search Radius', 'aka-stores' ); ?></label>
                             <div class="aka-dropdown">
                                 <select id="aka-radius-dropdown" class="" name="aka-radius">
                                     <?php echo aka_stores_get_dropdown_list('radius_options'); ?>
@@ -317,7 +330,7 @@ if ( !class_exists('Aka_Stores') ) {
                             </div>
                         </div>
                         <div id="aka-results">
-                            <label for="aka-results-dropdown">Results</label>
+                            <label for="aka-results-dropdown"><?php _e('Results', 'aka-stores'); ?></label>
                             <div class="aka-dropdown">
                                 <select id="aka-results-dropdown" class="" name="aka-results" >
                                     <?php echo aka_stores_get_dropdown_list('max_results'); ?>
@@ -425,7 +438,7 @@ if ( !class_exists('Aka_Stores') ) {
      * @return json A list of store locations that are located within the selected search radius
      */
     function aka_store_search() {
-        global $aka_store_setting;
+        $aka_store_setting = get_option('aka_store_options');
 
         $exploded_start_latlng = explode( ',', $aka_store_setting['start_latlng'] );
         $post_id = $_POST['post_id'];
@@ -471,13 +484,13 @@ if ( !class_exists('Aka_Stores') ) {
 
             switch ( $error_type ) {
                 case 'max_results':
-                $error_msg = __( 'The max results field cannot be empty, the default value has been restored.', 'aka_stores' );
+                $error_msg = __( 'The max results field cannot be empty, the default value has been restored.', 'aka-stores' );
                 break;
                 case 'radius_options':
-                $error_msg = __( 'The search radius field cannot be empty, the default value has been restored.', 'aka_stores' );
+                $error_msg = __( 'The search radius field cannot be empty, the default value has been restored.', 'aka-stores' );
                 break;
                 case 'start_point':
-                $error_msg = sprintf( __( 'Please provide the name of a city or country that can be used as a starting point under "Map Settings". %s This will only be used if auto-locating the user fails, or the option itself is disabled.', 'aka_stores' ), '<br><br>' );
+                $error_msg = sprintf( __( 'Please provide the name of a city or country that can be used as a starting point under "Map Settings". %s This will only be used if auto-locating the user fails, or the option itself is disabled.', 'aka-stores' ), '<br><br>' );
                 break;
             }
 
