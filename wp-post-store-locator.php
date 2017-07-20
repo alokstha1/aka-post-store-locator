@@ -87,7 +87,7 @@ if ( !class_exists('Aka_Stores') ) {
             wp_enqueue_script( 'aka-gmap', '//maps.google.com/maps/api/js' . aka_stores_gmap_api_params('browser_key'), false, AKA_STORE_VERSION, true );
             wp_enqueue_script( 'admin-script', AKA_STORE_URL.'assets/js/admin-script.js', array('jquery'), AKA_STORE_VERSION, true );
             wp_localize_script( 'admin-script', 'aka_stores', array(
-                'aka_settings' =>   $aka_store_setting,
+                'aka_settings' =>   stripslashes_deep( $aka_store_setting ),
                 'ajaxurl' => admin_url( 'admin-ajax.php' )
                 )
 
@@ -100,6 +100,7 @@ if ( !class_exists('Aka_Stores') ) {
         public function aka_stores_add_scripts_style() {
             $aka_store_setting = get_option('aka_store_options');
 
+            //deregister other google map scripts if enqueued
             aka_stores_deregister_other_gmaps();
 
             wp_enqueue_style( 'aka-front-style', AKA_STORE_URL.'assets/css/aka-front-style.css');
@@ -108,7 +109,7 @@ if ( !class_exists('Aka_Stores') ) {
 
             wp_enqueue_script( 'aka-front-js', AKA_STORE_URL.'assets/js/aka-maps.js', array('jquery'), AKA_STORE_VERSION, true );
             wp_localize_script( 'aka-front-js', 'aka_stores', array(
-                'aka_settings' =>   $aka_store_setting,
+                'aka_settings' =>   stripslashes_deep( $aka_store_setting ),
                 'ajaxurl' => admin_url( 'admin-ajax.php' ),
                 'marker_dir_url'    => AKA_STORE_URL.'markers/',
                 )
@@ -275,6 +276,10 @@ if ( !class_exists('Aka_Stores') ) {
             require AKA_STORE_PLUGIN_DIR.'metabox-form.php';
         }
 
+        /**
+        * Ajax response returns concatinated lat-long
+        * @return lat,lng(121.230045,234.000034573)
+        */
         public function aka_stores_return_address_latlng() {
             if ( isset( $_POST['location'] ) && !empty( $_POST['location'] ) ) {
                 $location = aka_stores_get_address_latlng($_POST['location']);
@@ -311,126 +316,133 @@ if ( !class_exists('Aka_Stores') ) {
                 $post_id = $values['id'];
             }
 
-            $aka_saved_locators = get_post_meta( $post_id, 'aka_saved_locators', true );
-            ob_start();
-            ?>
-            <div class="aka-store-wrap">
-                <div id="aka-search-wrap">
-                    <form class="aka-search-form">
-                        <div class="aka-input">
-                            <label for="aka-search-input"><?php _e('Location', 'aka-stores' ); ?></label>
-                            <input id="aka-search-input" value="" name="aka-search-input" placeholder="" aria-required="true" autocomplete="off" type="text">
-                        </div>
-                        <div id="aka-radius">
-                            <label for="aka-radius-dropdown"><?php _e('Search Radius', 'aka-stores' ); ?></label>
-                            <div class="aka-dropdown">
-                                <select id="aka-radius-dropdown" class="" name="aka-radius">
-                                    <?php echo aka_stores_get_dropdown_list('radius_options'); ?>
-                                </select>
+            $post_type = get_post_type( $post_id );
+
+            if ( in_array( $post_type, $aka_store_setting['post_type'] ) ){
+
+                $aka_saved_locators = get_post_meta( $post_id, 'aka_saved_locators', true );
+                ob_start();
+                ?>
+                <div class="aka-store-wrap">
+                    <div id="aka-search-wrap">
+                        <form class="aka-search-form">
+                            <div class="aka-input">
+                                <label for="aka-search-input"><?php _e('Location', 'aka-stores' ); ?></label>
+                                <input id="aka-search-input" value="" name="aka-search-input" placeholder="" aria-required="true" autocomplete="off" type="text">
                             </div>
-                        </div>
-                        <div id="aka-results">
-                            <label for="aka-results-dropdown"><?php _e('Results', 'aka-stores'); ?></label>
-                            <div class="aka-dropdown">
-                                <select id="aka-results-dropdown" class="" name="aka-results" >
-                                    <?php echo aka_stores_get_dropdown_list('max_results'); ?>
-                                </select>
+                            <div id="aka-radius">
+                                <label for="aka-radius-dropdown"><?php _e('Search Radius', 'aka-stores' ); ?></label>
+                                <div class="aka-dropdown">
+                                    <select id="aka-radius-dropdown" class="" name="aka-radius">
+                                        <?php echo aka_stores_get_dropdown_list('radius_options'); ?>
+                                    </select>
+                                </div>
                             </div>
-                        </div>
-                        <!-- <div class="aka-select-wrap">
-                    </div> -->
-                    <div class="aka-search-btn-wrap">
-                        <input type="hidden" id="aka_post_id" name="aka_post_id" value="<?php echo $post_id; ?>">
-                        <input id="aka-search-btn" value="Search" type="submit">
+                            <div id="aka-results">
+                                <label for="aka-results-dropdown"><?php _e('Results', 'aka-stores'); ?></label>
+                                <div class="aka-dropdown">
+                                    <select id="aka-results-dropdown" class="" name="aka-results" >
+                                        <?php echo aka_stores_get_dropdown_list('max_results'); ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="aka-search-btn-wrap">
+                                <input type="hidden" id="aka_post_id" name="aka_post_id" value="<?php echo $post_id; ?>">
+                                <input id="aka-search-btn" value="Search" type="submit">
+                            </div>
+                        </form>
                     </div>
-                </form>
-            </div>
 
-            <aside class="aka-right-wrap">
-                <div class="aka-map-wrap">
-                    <div id="aka-map" style="height: 418px;"></div>
-                </div>
-            </aside>
-            <aside class="aka-left-wrap">
+                    <aside class="aka-right-wrap">
+                        <div class="aka-map-wrap">
+                            <div id="aka-map" style="height: 418px;"></div>
+                            <!-- Map renders in aka-map id -->
+                        </div>
+                    </aside>
+                    <aside class="aka-left-wrap">
 
-                <?php
-                if ( !empty( $aka_saved_locators ) ) { ?>
-                <ul class="store-ul-lists" id="aka-store-lists">
+                        <?php
+                        if ( !empty( $aka_saved_locators ) ) { ?>
+                        <ul class="store-ul-lists" id="aka-store-lists">
 
-                    <?php
-                    foreach ( $aka_saved_locators as $aka_key => $store_value ) {
+                            <?php
+                            foreach ( $aka_saved_locators as $aka_key => $store_value ) {
 
-                        $sn = $aka_key;
-
-                        ?>
-                        <li class="store-items" id="store-item-id-<?php echo $aka_key; ?>" data-storeid="<?php echo $aka_key; ?>" data-storename="<?php echo $store_value['aka_name']; ?>" data-storeurl="<?php echo $store_value['aka_url']; ?>" data-latlng="<?php echo $store_value['aka_location_latn']; ?>" data-phone="<?php echo $store_value['aka_phone']; ?>" data-address="<?php echo $store_value['aka_location']; ?>" data-desc="<?php echo $store_value['aka_description']; ?>">
-                            <div class="map-content">
-                                <span class="store-key"><?php echo ++$sn; ?></span>
-                                <span class="store-title">
-                                    <?php $return_output = aka_stores_get_link_title( $store_value['aka_name'], $store_value['aka_url'], $aka_store_setting['show_url_field'] );
-
-                                    if ( !empty( $return_output ) ) {
-
-                                        if ( !empty( $return_output['before_wrap'] ) ) {
-                                            echo $return_output['before_wrap'];
-                                        }
-                                        if ( !empty( $return_output['title'] ) ) {
-                                            echo $return_output['title'];
-                                        }
-                                        if ( !empty( $return_output['after_wrap'] ) ) {
-                                            echo $return_output['after_wrap'];
-                                        }
-                                    }
-                                    ?>
-                                </span>
-                                <?php
-                                if ( $aka_store_setting['show_phone_field'] ) {
-
-                                    echo '<span class="store-items">'.$store_value['aka_phone'].'</span>';
-
-                                }
-
-                                echo '<span class="store-items">'.$store_value['aka_location'].'</span>';
-
-                                if ( $aka_store_setting['show_description_field'] ) {
-
-                                    echo '<p>'.$store_value['aka_description'].'</p>';
-
-                                }
-
-                                if ( $aka_store_setting['direction_view_control'] ) {
-                                    echo '<span class="store-items"><a class="aka-get-direction" href="#" id="get-direction-'.$aka_key.'">Direction</a></span>';
-                                }
-
+                                $sn = $aka_key;
 
                                 ?>
-                            </div>
-                        </li>
+                                <li class="store-items" id="store-item-id-<?php echo $aka_key; ?>" data-storeid="<?php echo $aka_key; ?>" data-storename="<?php echo $store_value['aka_name']; ?>" data-storeurl="<?php echo $store_value['aka_url']; ?>" data-latlng="<?php echo $store_value['aka_location_latn']; ?>" data-phone="<?php echo $store_value['aka_phone']; ?>" data-address="<?php echo $store_value['aka_location']; ?>" data-desc="<?php echo $store_value['aka_description']; ?>">
+                                    <div class="map-content">
+                                        <span class="store-key"><?php echo ++$sn; ?></span>
+                                        <span class="store-title">
+                                            <?php
+                                            $store_name = esc_attr( $store_value['aka_name'] );
+                                            $store_url = esc_url( $store_value['aka_url'] );
+                                            $show_url = intval( $aka_store_setting['show_url_field'] );
+                                            $return_output = aka_stores_get_link_title( $store_name, $store_url, $show_url );
+
+                                            if ( !empty( $return_output ) ) {
+
+                                                if ( !empty( $return_output['before_wrap'] ) ) {
+                                                    echo $return_output['before_wrap'];
+                                                }
+                                                if ( !empty( $return_output['title'] ) ) {
+                                                    echo $return_output['title'];
+                                                }
+                                                if ( !empty( $return_output['after_wrap'] ) ) {
+                                                    echo $return_output['after_wrap'];
+                                                }
+                                            }
+                                            ?>
+                                        </span>
+                                        <?php
+                                        if ( $aka_store_setting['show_phone_field'] ) {
+
+                                            echo sprintf( __( '%s%s%s', 'aka-stores' ),  '<span class="store-items">', esc_attr( $store_value['aka_phone'] ), '</span>');
+
+                                        }
+
+                                        echo sprintf( __( '%s%s%s', 'aka-stores' ), '<span class="store-items">', esc_attr( $store_value['aka_location'] ), '</span>' );
+
+                                        if ( $aka_store_setting['show_description_field'] ) {
+
+                                            echo sprintf( __( '%s%s%s', 'aka-stores' ), '<p>', esc_attr( $store_value['aka_description'] ), '</p>' );
+
+                                        }
+
+                                        if ( $aka_store_setting['direction_view_control'] ) {
+                                            echo sprintf( __( '%s<a class="aka-get-direction" href="#" id="%s">%s</a>%s', 'aka-stores' ), '<span class="store-items">', 'get-direction-'.$aka_key, 'Direction', '</span>');
+                                        }
+
+                                        ?>
+                                    </div>
+                                </li>
+                                <?php
+                            }
+                            ?>
+
+                        </ul>
+                        <?php
+                    }
+
+                //Render direction routes
+                    if ( $aka_store_setting['direction_view_control'] ) {
+                        ?>
+                        <div class="aka-ren-dir" id="aka-direction-detail" style="display: none;">
+                            <ul></ul>
+                        </div>
                         <?php
                     }
                     ?>
+                </aside>
+            </div>
+            <?php
 
-                </ul>
-                <?php
-            }
-
-                //Render direction routes
-            if ( $aka_store_setting['direction_view_control'] ) {
-                ?>
-                <div class="aka-ren-dir" id="aka-direction-detail" style="display: none;">
-                    <ul></ul>
-                </div>
-                <?php
-            }
-            ?>
-        </aside>
-    </div>
-    <?php
-
-    $return_content = ob_get_clean();
-    ob_flush();
-    return $return_content;
-}
+            $return_content = ob_get_clean();
+            ob_flush();
+            return $return_content;
+        }
+    }
 
 
     /**
@@ -443,8 +455,8 @@ if ( !class_exists('Aka_Stores') ) {
         $exploded_start_latlng = explode( ',', $aka_store_setting['start_latlng'] );
         $post_id = $_POST['post_id'];
 
-        $search_radius = $_POST['search_radius'];
-        $stores_count = $_POST['stores_count'];
+        $search_radius = intval( $_POST['search_radius'] );
+        $stores_count = intval( $_POST['stores_count'] );
 
 
         $myformlat = ( isset( $_POST['lat'] ) && !empty( $_POST['lat'] ) ) ? $_POST['lat'] : $exploded_start_latlng[0];
