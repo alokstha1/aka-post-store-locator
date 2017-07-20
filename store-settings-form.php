@@ -190,9 +190,9 @@ $aka_store_setting = get_option('aka_store_options');
                                     <?php _e( 'Distance Unit:', 'aka-stores' ); ?>
                                 </label>
                                 <span class="distance-boxes">
-                                    <input type="radio" name="aka_store_setting[distance_unit]" id="unit-km" value="km" <?php checked( $aka_store_setting['distance_unit'], 'km' ); ?> />
+                                    <input type="radio" name="aka_store_setting[distance_unit]" id="unit-km" value="km" <?php checked( 'km', $aka_store_setting['distance_unit'] ); ?> />
                                     <label for="unit-km">Km</label>
-                                    <input type="radio" name="aka_store_setting[distance_unit]" id="unit-mi" value="mi" <?php checked( $aka_store_setting['distance_unit'], 'mi' ); ?> />
+                                    <input type="radio" name="aka_store_setting[distance_unit]" id="unit-mi" value="mi" <?php checked( 'mi', $aka_store_setting['distance_unit'] ); ?> />
                                     <label for="unit-mi">Mi</label>
                                 </span>
                             </div>
