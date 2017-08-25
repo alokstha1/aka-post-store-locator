@@ -6,6 +6,41 @@
 	display: none !important;
 }
 
+.map-content {
+    position: relative;
+    padding-left: 20px;
+}
+
+.map-content span.store-items {
+    display: block;
+}
+
+span.store-items.get-direction {
+    font-weight: 900;
+    font-size: 13px;
+}
+
+.aka-info-wrap span {
+    display: block;
+}
+
+.aka-info-wrap label {
+	display: inline-block;
+}
+
+span.store-items.store-address:before {
+    content: "\f041";
+    left: 0;
+    font-family: 'FontAwesome';
+    padding-right: 5px;
+}
+
+span.store-items.store-phone:before {
+    content: "\f095";
+    left: 0;
+    font-family: 'FontAwesome';
+    padding-right: 5px;
+}
 
 /*--------------------------------------------------------------
  * ## Aka Search Wrap
@@ -91,6 +126,8 @@ ul.store-ul-lists li span.store-key{
 	font-weight: bold;
 	font-size: 18px;
 	margin-right: 5px;
+	position: absolute;
+	left: 0;
 }
 
 ul.store-ul-lists li span.store-title a{
