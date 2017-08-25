@@ -85,12 +85,6 @@ $aka_store_setting = get_option('aka_store_options');
                         <div class="aka-inside-wrap">
 
                             <div class="elm-wrap">
-                                <label for="locate-users">
-                                    <?php _e( 'Attempt to auto-locate the user:', 'aka-stores' ); ?>
-                                </label>
-                                <input type="checkbox" name="aka_store_setting[autolocate_users]" id="locate-users" value="" <?php checked( $aka_store_setting['autolocate_users'], true ); ?> />
-                            </div>
-                            <div class="elm-wrap">
                                 <label for="no-of-locations">
                                     <?php _e( 'Number of locations to show:', 'aka-stores' ); ?>
                                     <span class="aka-info">
@@ -172,20 +166,6 @@ $aka_store_setting = get_option('aka_store_options');
                             </div>
 
                             <div class="elm-wrap">
-                                <label for="search-radius-dropdown">
-                                    <?php _e( 'Show search radius dropdown?', 'aka-stores' ); ?>
-                                </label>
-                                <input type="checkbox" name="aka_store_setting[radius_dropdown]" id="search-radius-dropdown" value="" <?php checked( $aka_store_setting['radius_dropdown'], true ); ?> />
-                            </div>
-
-                            <div class="elm-wrap">
-                                <label for="enable-max-results">
-                                    <?php _e( 'Max search results dropdown:', 'aka-stores' ); ?>
-                                </label>
-                                <input type="checkbox" name="aka_store_setting[max_results_dropdown]" id="enable-max-results" value="" <?php checked( $aka_store_setting['max_results_dropdown'], true ); ?> />
-                            </div>
-
-                            <div class="elm-wrap">
                                 <label for="distance-unit">
                                     <?php _e( 'Distance Unit:', 'aka-stores' ); ?>
                                 </label>
@@ -235,63 +215,63 @@ $aka_store_setting = get_option('aka_store_options');
                             <div class="elm-wrap">
                                 <label for="post-type-select">
                                    <?php _e(' Select Post Type', 'aka-stores' ); ?>
-                                </label>
-                                <span class="post-types-boxes">
-                                    <?php
-                                    $post_types = get_post_types(array(
-                                        'public'    => true,
-                                        'show_ui' => true,
-                                        'show_in_menu' => true,
-                                        ), 'objects');
+                               </label>
+                               <span class="post-types-boxes">
+                                <?php
+                                $post_types = get_post_types(array(
+                                    'public'    => true,
+                                    'show_ui' => true,
+                                    'show_in_menu' => true,
+                                    ), 'objects');
 
-                                    foreach ($post_types as $post_type) {
-                                        if ( 'attachment' == $post_type->name )
-                                            continue;
-                                        ?>
-                                        <input type="checkbox" name="aka_store_setting[post_type][]" value="<?php echo $post_type->name; ?>" id="select-<?php echo $post_type->name; ?>" <?php if (isset($aka_store_setting['post_type']) && is_array($aka_store_setting['post_type'])) {
-                                            if (in_array($post_type->name, $aka_store_setting['post_type'])) {
-                                                echo 'checked="checked"';
-                                            }
-                                        }
-                                        ?>>
-                                        <label for="select-<?php echo $post_type->name; ?>">
-                                            <?php echo esc_attr( $post_type->label ); ?>
-                                        </label>
-
-                                        <?php
-                                    }
+                                foreach ($post_types as $post_type) {
+                                    if ( 'attachment' == $post_type->name )
+                                        continue;
                                     ?>
-                                </span>
-                            </div>
+                                    <input type="checkbox" name="aka_store_setting[post_type][]" value="<?php echo $post_type->name; ?>" id="select-<?php echo $post_type->name; ?>" <?php if (isset($aka_store_setting['post_type']) && is_array($aka_store_setting['post_type'])) {
+                                        if (in_array($post_type->name, $aka_store_setting['post_type'])) {
+                                            echo 'checked="checked"';
+                                        }
+                                    }
+                                    ?>>
+                                    <label for="select-<?php echo $post_type->name; ?>">
+                                        <?php echo esc_attr( $post_type->label ); ?>
+                                    </label>
 
-                            <div class="elm-wrap">
-                                <label for="show-description-field">
-                                    <?php _e( 'Show description field?', 'aka-stores' ); ?>
-                                </label>
-                                <input type="checkbox" name="aka_store_setting[show_description_field]" id="show-description-field" value="" <?php checked( $aka_store_setting['show_description_field'], true ); ?> />
-                            </div>
-                            <div class="elm-wrap">
-                                <label for="show-phone-field">
-                                    <?php _e( 'Show phone field?', 'aka-stores' ); ?>
-                                </label>
-                                <input type="checkbox" name="aka_store_setting[show_phone_field]" id="show-phone-field" value="" <?php checked( $aka_store_setting['show_phone_field'], true ); ?> />
-                            </div>
-                            <div class="elm-wrap">
-                                <label for="show-url-field">
-                                    <?php _e( 'Show url field?', 'aka-stores' ); ?>
-                                </label>
-                                <input type="checkbox" name="aka_store_setting[show_url_field]" id="show-url-field" value="" <?php checked( $aka_store_setting['show_url_field'], true ); ?> />
-                            </div>
-
+                                    <?php
+                                }
+                                ?>
+                            </span>
                         </div>
+
+                        <div class="elm-wrap">
+                            <label for="show-description-field">
+                                <?php _e( 'Show description field?', 'aka-stores' ); ?>
+                            </label>
+                            <input type="checkbox" name="aka_store_setting[show_description_field]" id="show-description-field" value="" <?php checked( $aka_store_setting['show_description_field'], true ); ?> />
+                        </div>
+                        <div class="elm-wrap">
+                            <label for="show-phone-field">
+                                <?php _e( 'Show phone field?', 'aka-stores' ); ?>
+                            </label>
+                            <input type="checkbox" name="aka_store_setting[show_phone_field]" id="show-phone-field" value="" <?php checked( $aka_store_setting['show_phone_field'], true ); ?> />
+                        </div>
+                        <div class="elm-wrap">
+                            <label for="show-url-field">
+                                <?php _e( 'Show url field?', 'aka-stores' ); ?>
+                            </label>
+                            <input type="checkbox" name="aka_store_setting[show_url_field]" id="show-url-field" value="" <?php checked( $aka_store_setting['show_url_field'], true ); ?> />
+                        </div>
+
                     </div>
                 </div>
-                <?php settings_fields( 'aka_store_options' ); ?>
             </div>
-            <p class="submit">
-                <?php submit_button( __( 'Save Changes', 'aka-stores' ), 'primary', 'submit_store', false ); ?>
-            </p>
-        </form>
-    </div>
+            <?php settings_fields( 'aka_store_options' ); ?>
+        </div>
+        <p class="submit">
+            <?php submit_button( __( 'Save Changes', 'aka-stores' ), 'primary', 'submit_store', false ); ?>
+        </p>
+    </form>
+</div>
 </div>
 <div class="clear"></div>

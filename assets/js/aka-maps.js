@@ -1,6 +1,6 @@
 jQuery(document).ready( function() {
 
-    //not needed: var resetMap,
+    //not needed: var resetMap, draggable, 
     var map, geocoder, displayDirection, serviceDirections, startMarkerData, infoWindow, autoCompleteLatLng,
     openInfoWindow = [],
     markersArray = [],
@@ -46,8 +46,9 @@ jQuery(document).ready( function() {
         }
 
         bounds        = new google.maps.LatLngBounds();
-        addMarker( startLatLng, null, false, infoWindow );
+        addMarker( startLatLng, null, infoWindow );
         bounds.extend( startLatLng );
+
 
         //loop over the store items and add map marker
         if ( jQuery('ul.store-ul-lists li').length > 0 ) {
@@ -56,7 +57,7 @@ jQuery(document).ready( function() {
 
                 var item_latlng = jQuery(this).data('latlng').split( "," );
                 latLng = new google.maps.LatLng( item_latlng[0], item_latlng[1] );
-                addMarker( latLng, index, false, infoWindow );
+                addMarker( latLng, index, infoWindow );
                 bounds.extend( latLng );
             });
 
@@ -81,10 +82,13 @@ jQuery(document).ready( function() {
 
     }
 
+
     function initAutocomplete() {
 
         var input, autocomplete, place,
         options = {};
+
+        if ( 1 == aka_stores.aka_settings.autocomplete ) {
 
             // Check if we need to set the geocode component restrictions.
             if ( typeof aka_stores.aka_settings.region !== "undefined" && aka_stores.aka_settings.region.length > 0 ) {
@@ -112,6 +116,7 @@ jQuery(document).ready( function() {
             });
 
         }
+    }
 
 
         /**
@@ -143,7 +148,7 @@ jQuery(document).ready( function() {
          * @param  {object}  infoWindow     The infoWindow object
          * @return {void}
          */
-         function addMarker( latLng, storeId, draggable, infoWindow ) {
+         function addMarker( latLng, storeId, infoWindow ) {
             var url, mapIcon, marker,
             keepStartMarker = true;
 
@@ -170,7 +175,6 @@ jQuery(document).ready( function() {
                 map: map,
                 optimized: false, //fixes markers flashing while bouncing
                 title: 'Test Title',//decodeHtmlEntity( infoWindowData.store ),
-                draggable: draggable,
                 storeId: storeId,
                 icon: mapIcon
             });
@@ -225,24 +229,24 @@ jQuery(document).ready( function() {
 
             var title_url_wrap = setTitleUrl(storeName, url, aka_stores.aka_settings.show_url_field);
             infoWindowContent += '<div class="aka-info-wrap">';
-            infoWindowContent += '<span class="aka-title"><label>Title:</label>';
+            infoWindowContent += '<span class="aka-title"><label>Title:</label> ';
             infoWindowContent += title_url_wrap.before_wrap;
             infoWindowContent += title_url_wrap.title;
             infoWindowContent += title_url_wrap.after_wrap;
             infoWindowContent += '</span>';
-            infoWindowContent += '<span class="aka-address"><label>Address:</label>';
+            infoWindowContent += '<span class="aka-address"><label>Address:</label> ';
             infoWindowContent += storeAddress;
             infoWindowContent += '</span>';
             if ( aka_stores.aka_settings.show_phone_field ) {
 
-                infoWindowContent += '<span class="aka-phone"><label>Phone No:</label>';
+                infoWindowContent += '<span class="aka-phone"><label>Phone No:</label> ' ;
                 infoWindowContent += storePhone;
                 infoWindowContent += '</span>';
 
             }
             if ( aka_stores.aka_settings.show_description_field ) {
 
-                infoWindowContent += '<span class="aka-desc"><label>Description:</label>';
+                infoWindowContent += '<span class="aka-desc"><label>Description:</label> ';
                 infoWindowContent += storeDescription;
                 infoWindowContent += '</span>';
 
@@ -256,6 +260,7 @@ jQuery(document).ready( function() {
 
             openInfoWindow.push( infoWindow );
         }
+
 
         /**
         * Set the url for the title in infowindow
@@ -290,7 +295,6 @@ jQuery(document).ready( function() {
                 e.preventDefault();
 
                 var keepStartMarker = false;
-                resetMap = false;
 
                 // Force the open InfoBox info window to close.
                 closeInfoBoxWindow();
@@ -417,27 +421,23 @@ jQuery(document).ready( function() {
          * @returns {void}
          */
          function prepareStoreSearch( prepare_latLng, infoWindow ) {
-            var autoLoad = false;
 
             // Add a new start marker.
-            addMarker( prepare_latLng, null, true, infoWindow );
+            addMarker( prepare_latLng, null, infoWindow );
 
             // Try to find stores that match the radius, location criteria.
-            makeAjaxRequest( prepare_latLng, resetMap, autoLoad, infoWindow );
+            makeAjaxRequest( prepare_latLng, infoWindow );
         }
 
 
         /**
          * Make the AJAX request to load the store data.
          *
-         * @since   1.2.0
          * @param   {object}  startLatLng The latlng used as the starting point
-         * @param   {boolean} resetMap    Whether we should reset the map or not
-         * @param   {string}  autoLoad    Check if we need to autoload all the stores
          * @param   {object}  infoWindow  The infoWindow object
          * @returns {void}
          */
-         function makeAjaxRequest( startLatLng, resetMap, autoLoad, infoWindow ) {
+         function makeAjaxRequest( startLatLng, infoWindow ) {
 
             var post_id = jQuery('#aka_post_id').val();
             var storeList = jQuery("#aka-store-lists");
@@ -473,24 +473,24 @@ jQuery(document).ready( function() {
 
                         result_html += '<li class="store-items" id="store-item-id-'+index+'" data-storeid="'+index+'" data-storename="'+value.aka_name+'" data-storeurl="'+value.aka_url+'" data-latlng="'+value.aka_location_latn+'" data-phone="'+value.aka_phone+'" data-address="'+value.aka_location+'" data-desc="'+value.aka_description+'">';
                         result_html += '<div class="map-content">';
+                        result_html += '<h3 class="store-title">';
                         result_html += '<span class="store-key">'+serial_no+'</span>';
-                        result_html += '<span class="store-title">';
                         result_html += title_url_wrap.before_wrap;
                         result_html += title_url_wrap.title;
                         result_html += title_url_wrap.after_wrap;
+                        result_html += '</h3>';
+                        result_html += '<span class="store-items store-address">'+value.aka_location;
                         result_html += '</span>';
                         if ( aka_stores.aka_settings.show_phone_field ) {
 
-                            result_html += '<span class="store-phone">'+value.aka_phone+'</span>';
+                            result_html += '<span class="store-items store-phone">'+value.aka_phone+'</span>';
                         }
-                        result_html += '<span class="store-address">'+value.aka_location;
-                        result_html += '</span>';
                         if ( aka_stores.aka_settings.show_description_field ) {
 
                             result_html += '<p>'+value.aka_description+'</p>';
                         }
                         if ( aka_stores.aka_settings.direction_view_control ) {
-                            result_html += '<span class="store-items"><a class="aka-get-direction" href="#" id="get-direction-'+index+'">Direction</a></span>';
+                            result_html += '<span class="store-items get-direction"><a class="aka-get-direction" href="#" id="get-direction-'+index+'">Get Direction</a></span>';
                         }
                         result_html += '</div>';
                         result_html += '</li>';
@@ -499,7 +499,7 @@ jQuery(document).ready( function() {
                         var item_latlng = value.aka_location_latn.split( "," );
                         response_latLng = new google.maps.LatLng( item_latlng[0], item_latlng[1] );
 
-                        addMarker( response_latLng, index, false, infoWindow );
+                        addMarker( response_latLng, index, infoWindow );
 
                     });
                     //Append items to lists.

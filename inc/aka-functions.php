@@ -15,7 +15,7 @@ function aka_stores_gmap_api_params( $api_key_type, $geocode_params = false ) {
     $first_sep = ( $geocode_params ) ? '&' : '?';
 
     foreach ( $param_keys as $param_key ) {
-        if ( $param_key == 'key' ) {
+        if ( 'key' == $param_key ) {
             $option_key = $api_key_type;
         } else {
             $option_key = $param_key;
@@ -32,7 +32,7 @@ function aka_stores_gmap_api_params( $api_key_type, $geocode_params = false ) {
         $api_params = $first_sep . rtrim( $api_params, '&' );
     }
 
-    if ( $aka_store_setting['autolocate_users'] && $api_key_type == 'browser_key' ) {
+    if ( 'browser_key' == $api_key_type && $aka_store_setting['autocomplete']  ) {
         $api_params .= '&libraries=places';
     }
 
@@ -392,7 +392,6 @@ function aka_stores_default_settings() {
         'browser_key'                   => '',
         'language'                      => 'en',
         'region'                        => '',
-        'autolocate_users'              => 1,
         'no_of_locations'               => '50',
         'start_point'                   => '',
         'start_latlng'                  => '',
@@ -402,9 +401,7 @@ function aka_stores_default_settings() {
         'map_type_control'              => 0,
         'scrollwheel_zoom'              => 1,
         'map_type'                      => 'roadmap',
-        'autocomplete'                  => 0,
-        'radius_dropdown'               => 1,
-        'max_results_dropdown'          => 0,
+        'autocomplete'                  => 1,
         'distance_unit'                 => 'km',
         'max_results'                   => '[25],50,75,100',
         'radius_options'                => '10,25,[50],100,200,500',
@@ -513,7 +510,7 @@ function aka_stores_get_dropdown_list( $list_type ) {
     $settings      = explode( ',', $aka_store_setting[$list_type] );
 
     // Only show the distance unit if we are dealing with the search radius.
-    if ( $list_type == 'radius_options' ) {
+    if ( 'radius_options' == $list_type  ) {
         $distance_unit = ' '. esc_attr( $aka_store_setting['distance_unit'] );
     } else {
         $distance_unit = '';
@@ -556,18 +553,4 @@ function aka_stores_get_link_title( $title, $url, $show_url ) {
         $return_output['after_wrap'] = '';
     }
     return $return_output;
-}
-
-
-/**
-* Debug
-*/
-function pre_debug( $value, $die = false ) {
-
-    echo "<pre>";
-    print_r( $value );
-    echo "</pre>";
-    if ($die) {
-        die();
-    }
 }

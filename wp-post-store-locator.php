@@ -162,7 +162,6 @@ if ( !class_exists('Aka_Stores') ) {
             //End of Map Api Section
 
             //General Map Setting
-            $input_options['autolocate_users'] = isset( $store_post_array['autolocate_users'] ) ? 1 : 0;
 
             $input_options['no_of_locations'] = isset( $store_post_array['no_of_locations'] ) ? 1 : 0;
 
@@ -206,10 +205,6 @@ if ( !class_exists('Aka_Stores') ) {
 
             //Start of Search
                 $input_options['autocomplete'] = isset( $store_post_array['autocomplete'] ) ? 1 : 0;
-
-                $input_options['radius_dropdown'] = isset( $store_post_array['radius_dropdown'] ) ? 1 : 0;
-
-                $input_options['max_results_dropdown'] = isset( $store_post_array['max_results_dropdown'] ) ? 1 : 0;
 
                 $input_options['distance_unit'] = ( $store_post_array['distance_unit'] == 'km' ) ? 'km' : 'mi';
 
@@ -373,8 +368,8 @@ if ( !class_exists('Aka_Stores') ) {
                                 ?>
                                 <li class="store-items" id="store-item-id-<?php echo $aka_key; ?>" data-storeid="<?php echo $aka_key; ?>" data-storename="<?php echo $store_value['aka_name']; ?>" data-storeurl="<?php echo $store_value['aka_url']; ?>" data-latlng="<?php echo $store_value['aka_location_latn']; ?>" data-phone="<?php echo $store_value['aka_phone']; ?>" data-address="<?php echo $store_value['aka_location']; ?>" data-desc="<?php echo $store_value['aka_description']; ?>">
                                     <div class="map-content">
+                                        <h3 class="store-title">
                                         <span class="store-key"><?php echo ++$sn; ?></span>
-                                        <span class="store-title">
                                             <?php
                                             $store_name = esc_attr( $store_value['aka_name'] );
                                             $store_url = esc_url( $store_value['aka_url'] );
@@ -394,15 +389,16 @@ if ( !class_exists('Aka_Stores') ) {
                                                 }
                                             }
                                             ?>
-                                        </span>
+                                        </h3>
                                         <?php
+
+                                        echo sprintf( __( '%s%s%s', 'aka-stores' ), '<span class="store-items store-address">', esc_attr( $store_value['aka_location'] ), '</span>' );
+
                                         if ( $aka_store_setting['show_phone_field'] ) {
 
-                                            echo sprintf( __( '%s%s%s', 'aka-stores' ),  '<span class="store-items">', esc_attr( $store_value['aka_phone'] ), '</span>');
+                                            echo sprintf( __( '%s%s%s', 'aka-stores' ),  '<span class="store-items store-phone">', esc_attr( $store_value['aka_phone'] ), '</span>');
 
                                         }
-
-                                        echo sprintf( __( '%s%s%s', 'aka-stores' ), '<span class="store-items">', esc_attr( $store_value['aka_location'] ), '</span>' );
 
                                         if ( $aka_store_setting['show_description_field'] ) {
 
@@ -411,7 +407,7 @@ if ( !class_exists('Aka_Stores') ) {
                                         }
 
                                         if ( $aka_store_setting['direction_view_control'] ) {
-                                            echo sprintf( __( '%s<a class="aka-get-direction" href="#" id="%s">%s</a>%s', 'aka-stores' ), '<span class="store-items">', 'get-direction-'.$aka_key, 'Direction', '</span>');
+                                            echo sprintf( __( '%s<a class="aka-get-direction" href="#" id="%s">%s</a>%s', 'aka-stores' ), '<span class="store-items get-direction">', 'get-direction-'.$aka_key, 'Get Direction', '</span>');
                                         }
 
                                         ?>
