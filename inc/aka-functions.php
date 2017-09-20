@@ -428,6 +428,20 @@ function aka_stores_deregister_other_gmaps() {
     global $wp_scripts;
     if ( !empty( $wp_scripts->registered ) ) {
         foreach ( $wp_scripts->registered as $index => $script ) {
+            if ( ( strpos( $script->src, 'font-awesome.min.css' ) !== false ) || ( strpos( $script->src, 'font-awesome.css' ) !== false ) && ( $script->handle !== 'aka-load-fa' ) ) {
+                wp_deregister_script( $script->handle );
+            }
+        }
+    }
+}
+
+/**
+* Deregister other Font Awesome
+*/
+function aka_stores_deregister_other_font_awesome() {
+    global $wp_scripts;
+    if ( !empty( $wp_scripts->registered ) ) {
+        foreach ( $wp_scripts->registered as $index => $script ) {
             if ( ( strpos( $script->src, 'maps.google.com' ) !== false ) || ( strpos( $script->src, 'maps.googleapis.com' ) !== false ) && ( $script->handle !== 'aka-gmap' ) ) {
                 wp_deregister_script( $script->handle );
             }
