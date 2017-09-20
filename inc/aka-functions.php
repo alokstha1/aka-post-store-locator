@@ -392,7 +392,6 @@ function aka_stores_default_settings() {
         'browser_key'                   => '',
         'language'                      => 'en',
         'region'                        => '',
-        'no_of_locations'               => '50',
         'start_point'                   => '',
         'start_latlng'                  => '',
         'zoom_level'                    => 3,
