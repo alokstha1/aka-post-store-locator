@@ -121,6 +121,7 @@ jQuery(document).ready( function() {
 
         /**
          * Return the latlng coordinates that are used to init the map.
+         * @return {void}
          */
          function getStartLatlng() {
             var startLatLng, latLng;
@@ -139,12 +140,9 @@ jQuery(document).ready( function() {
 
 
         /**
-         * Add a new marker to the map based on the provided location (latlng).
-         *
-         * @since  1.0.0
+         * Add a new marker to the map based on the provided location (latLng).
          * @param  {object}  latLng         The coordinates
          * @param  {number}  storeId        The store id
-         * @param  {boolean} draggable      Should the marker be draggable
          * @param  {object}  infoWindow     The infoWindow object
          * @return {void}
          */
@@ -153,7 +151,7 @@ jQuery(document).ready( function() {
             keepStartMarker = true;
 
             if ( storeId == null ) {
-                url = aka_stores.marker_dir_url + 'red.png';
+                url = aka_stores.initial_location_marker;
                 mapIcon = {
                     url: url,
                     scaledSize: new google.maps.Size( 24, 36 ), //retina format
@@ -161,7 +159,7 @@ jQuery(document).ready( function() {
                     anchor: new google.maps.Point( 0, 32 )
                 };
             } else {
-                url = aka_stores.marker_dir_url + 'blue.png';
+                url = aka_stores.store_location_marker;
                 mapIcon = {
                     url: url,
                     scaledSize: new google.maps.Size( 20, 32 ), //retina format
@@ -204,8 +202,6 @@ jQuery(document).ready( function() {
 
         /**
          * Set the correct info window content for the marker.
-         *
-         * @since   1.2.20
          * @param   {integer} storeId          Store Id
          * @param   {object} marker            Marker data
          * @param   {object} infoWindow        The infoWindow object
@@ -216,7 +212,6 @@ jQuery(document).ready( function() {
             var infoWindowContent = '', storeName, storeUrl, storeLatLng, storePhone, storeDescription, storeAddress, url = '';
             storeName = jQuery('#store-item-id-'+storeId).data('storename');
             storeUrl = jQuery('#store-item-id-'+storeId).data('storeurl');
-            // storeLatLng = jQuery('#store-item-id-'+storeId).data('storelatlng');
             storePhone = jQuery('#store-item-id-'+storeId).data('phone');
             storeAddress = jQuery('#store-item-id-'+storeId).data('address');
             storeDescription = jQuery('#store-item-id-'+storeId).data('desc');
@@ -225,7 +220,6 @@ jQuery(document).ready( function() {
                 url = storeUrl;
             }
 
-            // aka_stores.aka_settings
 
             var title_url_wrap = setTitleUrl(storeName, url, aka_stores.aka_settings.show_url_field);
             infoWindowContent += '<div class="aka-info-wrap">';
@@ -264,8 +258,10 @@ jQuery(document).ready( function() {
 
         /**
         * Set the url for the title in infowindow
-        *
-        *
+        * @param   {string} title            TItle
+        * @param   {string} url              Url
+        * @param   {boolean} show_url        Show or hide url
+        * @returns {string}                  Formatted url
         */
         function setTitleUrl(title, url, show_url) {
 
@@ -288,6 +284,8 @@ jQuery(document).ready( function() {
 
         /**
         * Set form element to search stores
+        * @param   {object} infoWindow        The infoWindow object
+        * @returns {void}
         */
         function initialize_store_search( infoWindow ) {
 
@@ -321,10 +319,8 @@ jQuery(document).ready( function() {
         }
 
         /**
-         * Force the open InfoBox info window to close
-         *
-         * This is required if the user makes a new search.
-         *
+         * Force the open InfoBox info window to close.
+         * @returns {void}
          */
          function closeInfoBoxWindow() {
             if ( typeof openInfoWindow[0] !== "undefined" ) {
@@ -334,8 +330,6 @@ jQuery(document).ready( function() {
 
         /**
          * Remove all existing markers from the map.
-         *
-         * @since   1.0.0
          * @param   {boolean} keepStartMarker Whether or not to keep the start marker while removing all the other markers from the map
          * @returns {void}
          */
@@ -368,8 +362,6 @@ jQuery(document).ready( function() {
 
         /**
          * Remove the start marker from the map.
-         *
-         * @since   1.2.12
          * @returns {void}
          */
          function deleteStartMarker() {
@@ -381,8 +373,6 @@ jQuery(document).ready( function() {
 
         /**
          * Geocode the user input.
-         *
-         * @since   1.0.0
          * @param   {object} infoWindow The infoWindow object
          * @returns {void}
          */
@@ -416,7 +406,7 @@ jQuery(document).ready( function() {
 
         /**
          * Prepare a new location search.
-         * @param   {object} latLng
+         * @param   {object} prepare_latLng
          * @param   {object} infoWindow The infoWindow object.
          * @returns {void}
          */
@@ -538,8 +528,6 @@ jQuery(document).ready( function() {
 
          /**
           * Zoom the map so that all markers fit in the window.
-          *
-          * @since  1.0.0
           * @returns {void}
           */
           function fitBounds() {
@@ -563,8 +551,8 @@ jQuery(document).ready( function() {
 
 
          /**
-         *  Trigger to render driving directions.
-         *
+         * Trigger to render driving directions.
+         * @returns {void}
          */
          function render_direction() {
             jQuery( "#aka-store-lists" ).on( "click", ".aka-get-direction", function() {
@@ -579,8 +567,6 @@ jQuery(document).ready( function() {
 
          /**
           * Show the driving directions.
-          *
-          * @since  1.1.0
           * @param  {object} e The clicked elemennt
           * @returns {void}
           */
@@ -628,8 +614,6 @@ jQuery(document).ready( function() {
 
          /**
           * Calculate the route from the start to the end.
-          *
-          * @since  1.0.0
           * @param  {object} start The latlng from the start point
           * @param  {object} end   The latlng from the end point
           * @returns {void}
@@ -694,6 +678,11 @@ jQuery(document).ready( function() {
             });
         }
 
+
+        /**
+        * Triggers when clicked on back button to locations lists when directions are shown.
+        * @returns {void}
+        */
         function triggerLocationLists() {
              // Handle the click on the back button when the route directions are displayed.
              jQuery( "#aka-direction-detail" ).on( "click", ".aka-back", function() {
@@ -725,6 +714,10 @@ jQuery(document).ready( function() {
          }
 
 
+         /**
+         * Animate bounce when mouse enters or leavs the list items. 
+         * @returns {void}
+         */
          function toggleMarkerAnimation() {
 
             jQuery('ul#aka-store-lists').on('mouseenter', 'li', function(){
@@ -737,6 +730,10 @@ jQuery(document).ready( function() {
 
         }
 
+        /**
+        * Animation bounce triggered.
+        * @returns {void}
+        */
         function letsAnimate( storeId, status ) {
            var i, len, marker;
 
