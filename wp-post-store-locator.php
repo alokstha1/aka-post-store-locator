@@ -6,7 +6,7 @@
  * Version:1.0
  * Author: Alok Shrestha
  * Text Domain: aka-stores
- * License:GPLv2 or later
+ * License: GPLv3 or later
  */
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly.
@@ -170,8 +170,6 @@ if ( !class_exists('Aka_Stores') ) {
             //End of Map Api Section
 
             //General Map Setting
-
-            $input_options['no_of_locations'] = isset( $store_post_array['no_of_locations'] ) ? 1 : 0;
 
             $input_options['start_point'] = sanitize_text_field( $store_post_array['start_point'] );
 
