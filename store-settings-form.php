@@ -85,17 +85,6 @@ $aka_store_setting = get_option('aka_store_options');
                         <div class="aka-inside-wrap">
 
                             <div class="elm-wrap">
-                                <label for="no-of-locations">
-                                    <?php _e( 'Number of locations to show:', 'aka-stores' ); ?>
-                                    <span class="aka-info">
-                                        <span class="aka-info-text aka-hide">
-                                            <?php _e( 'If this field is left empty or set to 0, then all locations are loaded.', 'aka-stores' ); ?>
-                                        </span>
-                                    </span>
-                                </label>
-                                <input type="text" name="aka_store_setting[no_of_locations]" id="no-of-locations" value="<?php echo ( !empty( $aka_store_setting['no_of_locations']) ) ? intval( $aka_store_setting['no_of_locations'] ) : ''; ?>" />
-                            </div>
-                            <div class="elm-wrap">
                                 <label for="map-start-point">
                                     <?php _e( 'Start Point:', 'aka-stores' ); ?>
                                     <span class="aka-info">
