@@ -1,5 +1,6 @@
 jQuery(document).ready( function() {
 
+    //Add stores elements submitted in each posts
     jQuery('#aka-newmeta-submit').on( 'click', function(e) {
         e.preventDefault();
 
@@ -59,12 +60,12 @@ jQuery(document).ready( function() {
     });
 
 
+    //Trigger delete the stores row
     jQuery('a.aka-button-delete').live( 'click', function(e) {
         e.preventDefault();
         if ( confirm("Are you sure?") ) {
                 jQuery(this).closest('tr').remove();
                 var fields_count = jQuery('[name="aka_fields_count"]').val();
-                // jQuery('[name="aka_fields_count"]').val(--fields_count);
            }
     });
 
@@ -78,34 +79,6 @@ jQuery(document).ready( function() {
         jQuery( this ).find( ".aka-info-text" ).css( 'display', 'none');
     });
 
-    jQuery('#add-selected-field').on( 'click', function(e) {
-        e.preventDefault();
-
-        var field_type = jQuery('select[name="field_type"]').val();
-
-        var field_html = '';
-        var custom_field_count = jQuery('[name="aka_store_setting[field_count]"]').val();
-
-        if ( field_type == 'text' ) {
-
-            field_html = return_field_html( field_type, custom_field_count );
-
-        } else if ( field_type == 'textarea' ) {
-
-            field_html = return_field_html( field_type, custom_field_count );
-
-        } else if ( field_type == 'url' ) {
-
-            field_html = return_field_html( field_type, custom_field_count );
-
-
-        }
-
-        jQuery('.field-added-response').append(field_html);
-
-        jQuery(".field_settings").tabs();
-
-    });
 
     jQuery('a.remove-fields').live( 'click', function(e) {
         e.preventDefault();
@@ -128,38 +101,6 @@ jQuery(document).ready( function() {
     //initialize tab on backend
     jQuery('#tabs-wrap').tabs();
 });
-
-function return_field_html( field_type, count) {
-
-    var cnt = count;
-
-    var field_html = '<span class="custom-field" id="custom-field-'+cnt+'">';
-    field_html += '<div class="field_settings" >';
-    field_html += '<ul>';
-    field_html += '<li style="width:100px; padding:0px;">';
-    field_html += '<a href="#gform_tab_1">General</a>';
-    field_html += '</li>';
-    field_html += '<li style="width:100px; padding:0px; ">';
-    field_html += '<a href="#gform_tab_2">Appearance</a>';
-    field_html += '</li>';
-    field_html += '</ul>';
-    field_html += '<div id="gform_tab_1">';
-    field_html += '<input type="text" name="aka_store_setting[appended_field]['+cnt+'][name]" placeholder="Field Name">';
-    field_html += '<input type="text" name="aka_store_setting[appended_field]['+cnt+'][label]" placeholder="Field Label">';
-    field_html += '<input type="hidden" name="aka_store_setting[appended_field]['+cnt+'][type]" value="'+field_type+'">';
-    field_html += '<a href="#" class="remove-fields" id="remove-'+cnt+'">Remove</a>';
-    field_html += '</div>';
-    field_html += '<div id="gform_tab_2">';
-    field_html += 'Appearance section';
-    field_html += '</div>';
-    field_html += '</div>';
-    // field_html += '</div>';
-    field_html += '</span>';
-    ++count;
-    jQuery('[name="aka_store_setting[field_count]"]').val(count);
-
-    return field_html;
-}
 
 
 /**
@@ -222,6 +163,7 @@ function stripCoordinates( coordinates ) {
 
 /**
  * Round the coordinate to 6 digits after the comma.
+ * @returns {float} roundoff coordinates values
  */
 function roundCoordinate( coordinate ) {
     var roundedCoord, decimals = 6;
