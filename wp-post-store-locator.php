@@ -5,7 +5,6 @@
  * Description:A full-featured map maker & location management interface for creating store locator for any posts of any post type.
  * Version:1.0
  * Author: Alok Shrestha
- * Author URI: http://alokshrestha.com.np
  * Text Domain: aka-stores
  * License:GPLv2 or later
  */
@@ -103,15 +102,24 @@ if ( !class_exists('Aka_Stores') ) {
             //deregister other google map scripts if enqueued
             aka_stores_deregister_other_gmaps();
 
+            //deregister other font awesome scripts if enqueued
+            aka_stores_deregister_other_font_awesome();
+
             wp_enqueue_style( 'aka-front-style', AKA_STORE_URL.'assets/css/aka-front-style.css');
+            
+            wp_enqueue_style( 'aka-load-fa', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css' );
 
             wp_enqueue_script( 'aka-gmap', '//maps.google.com/maps/api/js' . aka_stores_gmap_api_params('browser_key'), false, AKA_STORE_VERSION, true );
 
             wp_enqueue_script( 'aka-front-js', AKA_STORE_URL.'assets/js/aka-maps.js', array('jquery'), AKA_STORE_VERSION, true );
+
+            $store_location_marker = apply_filters( 'aka_store_marker', AKA_STORE_URL.'markers/blue.png');
+            $initial_location_marker = apply_filters( 'aka_initial_marker', AKA_STORE_URL.'markers/red.png');
             wp_localize_script( 'aka-front-js', 'aka_stores', array(
                 'aka_settings' =>   stripslashes_deep( $aka_store_setting ),
                 'ajaxurl' => admin_url( 'admin-ajax.php' ),
-                'marker_dir_url'    => AKA_STORE_URL.'markers/',
+                'store_location_marker' => $store_location_marker,
+                'initial_location_marker' => $initial_location_marker,
                 )
 
             );
@@ -366,7 +374,7 @@ if ( !class_exists('Aka_Stores') ) {
                                 $sn = $aka_key;
 
                                 ?>
-                                <li class="store-items" id="store-item-id-<?php echo $aka_key; ?>" data-storeid="<?php echo $aka_key; ?>" data-storename="<?php echo $store_value['aka_name']; ?>" data-storeurl="<?php echo $store_value['aka_url']; ?>" data-latlng="<?php echo $store_value['aka_location_latn']; ?>" data-phone="<?php echo $store_value['aka_phone']; ?>" data-address="<?php echo $store_value['aka_location']; ?>" data-desc="<?php echo $store_value['aka_description']; ?>">
+                                <li class="store-items" id="store-item-id-<?php echo $aka_key; ?>" data-storeid="<?php echo $aka_key; ?>" data-storename="<?php echo esc_attr( $store_value['aka_name'] ); ?>" data-storeurl="<?php echo esc_url( $store_value['aka_url'] ); ?>" data-latlng="<?php echo esc_attr( $store_value['aka_location_latn'] ); ?>" data-phone="<?php echo esc_attr( $store_value['aka_phone'] ); ?>" data-address="<?php echo esc_attr( $store_value['aka_location'] ); ?>" data-desc="<?php echo $store_value['aka_description']; ?>">
                                     <div class="map-content">
                                         <h3 class="store-title">
                                         <span class="store-key"><?php echo ++$sn; ?></span>
@@ -449,7 +457,7 @@ if ( !class_exists('Aka_Stores') ) {
         $aka_store_setting = get_option('aka_store_options');
 
         $exploded_start_latlng = explode( ',', $aka_store_setting['start_latlng'] );
-        $post_id = $_POST['post_id'];
+        $post_id = intval( $_POST['post_id'] );
 
         $search_radius = intval( $_POST['search_radius'] );
         $stores_count = intval( $_POST['stores_count'] );
